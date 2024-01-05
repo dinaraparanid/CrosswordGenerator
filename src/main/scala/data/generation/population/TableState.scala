@@ -1,5 +1,13 @@
 package data.generation.population
 
+import cats.Show
+
+import scala.util.Random
+
+/** Wrapper for a table of characters */
+
+type Table = Array[Array[Char]]
+
 /**
  * The state of a crossword's table
  *
@@ -9,7 +17,7 @@ package data.generation.population
 
 case class TableState(table: Table, words: List[WordState])
 
-type Table = Array[Array[Char]]
-
-enum Layout:
-	case HORIZONTAL, VERTICAL
+object TableState:
+	given showTable: Show[TableState] = Show.show {
+		_.table map { _ mkString " " } mkString "\n"
+	}

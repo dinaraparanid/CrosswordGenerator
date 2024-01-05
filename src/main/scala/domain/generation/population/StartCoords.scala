@@ -1,5 +1,6 @@
 package domain.generation.population
 
+import domain.generation.generator
 import data.generation.population.{Coords, Layout}
 
 import scala.util.Random
@@ -11,14 +12,13 @@ import scala.util.Random
  *
  * @param word   word to be placed in the table
  * @param layout layout of the word (0 - horizontal, 1 - vertical)
- * @param random random generator
  * @return tuple of starting row and column
  */
 
-def startCoords(word: String, tableSize: Int, layout: Layout, random: Random): Coords =
+def startCoords(word: String, tableSize: Int, layout: Layout): Coords =
 	layout match
-		case Layout.HORIZONTAL ⇒ startCoordsHorizontal(word, tableSize, random)
-		case Layout.VERTICAL ⇒ startCoordsVertical(word, tableSize, random)
+		case Layout.HORIZONTAL ⇒ startCoordsHorizontal(word, tableSize)
+		case Layout.VERTICAL ⇒ startCoordsVertical(word, tableSize)
 
 /**
  * Generates the starting coordinates for placing a word in the table in horizontal position.
@@ -29,10 +29,10 @@ def startCoords(word: String, tableSize: Int, layout: Layout, random: Random): C
  * @return tuple of starting row and column
  */
 
-private def startCoordsHorizontal(word: String, tableSize: Int, random: Random): Coords =
+private def startCoordsHorizontal(word: String, tableSize: Int)(using random: Random): Coords =
 	val startRow = random nextInt tableSize
 	val startColumn = random nextInt (tableSize - word.length + 1)
-	Coords(startRow, startColumn, '\u0000')
+	Coords(startRow, startColumn, EmptyLetter)
 
 /**
  * Generates the starting coordinates for placing a word in the table in vertical position.
@@ -43,7 +43,7 @@ private def startCoordsHorizontal(word: String, tableSize: Int, random: Random):
  * @return tuple of starting row and column
  */
 
-private def startCoordsVertical(word: String, tableSize: Int, random: Random): Coords =
+private def startCoordsVertical(word: String, tableSize: Int)(using random: Random): Coords =
 	val startRow = random nextInt (tableSize - word.length + 1)
 	val startColumn = random nextInt tableSize
-	Coords(startRow, startColumn, '\u0000')
+	Coords(startRow, startColumn, EmptyLetter)

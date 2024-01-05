@@ -5,10 +5,10 @@ package data.generation.population
  *
  * @param row    zero-based row index of the character
  * @param column zero-based column index of the character
- * @param c      character itself
+ * @param letter character itself
  */
 
-case class Coords(row: Int, column: Int, c: Char)
+case class Coords(row: Int, column: Int, letter: Char)
 
 /**
  * Word's coordinates and the layout within a table

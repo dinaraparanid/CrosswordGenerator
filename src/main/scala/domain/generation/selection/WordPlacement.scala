@@ -2,6 +2,7 @@ package domain.generation.selection
 
 import data.generation.population.Layout.{HORIZONTAL, VERTICAL}
 import data.generation.population.{Layout, Table, WordState}
+import domain.generation.selection.filters.*
 
 /**
  * Checks if the word can be placed in the table
@@ -11,7 +12,7 @@ import data.generation.population.{Layout, Table, WordState}
  * @param word            word to be placed in the table
  * @param startRow        starting row coordinate for the word
  * @param startColumn     starting column coordinate for the word
- * @param layout          layout of the word (0 - horizontal, 1 - vertical)
+ * @param layout          layout of the word
  * @param table           table in which to place the word
  * @param horizontalWords horizontal words placed in the table
  * @param verticalWords   vertical words placed in the table
@@ -19,13 +20,13 @@ import data.generation.population.{Layout, Table, WordState}
  */
 
 def canPutWord(
-	word: String,
-	startRow: Int,
-	startColumn: Int,
-	layout: Layout,
-	table: Table,
+	word:            String,
+	startRow:        Int,
+	startColumn:     Int,
+	layout:          Layout,
+	table:           Table,
 	horizontalWords: List[WordState],
-	verticalWords: List[WordState]
+	verticalWords:   List[WordState]
 ): Boolean = layout match
 	case Layout.HORIZONTAL ⇒ canPutWordHorizontal(
 		word = word,
@@ -56,10 +57,10 @@ def canPutWord(
  */
 
 def canPutWord(
-	wordState: WordState,
-	table: Table,
+	wordState:       WordState,
+	table:           Table,
 	horizontalWords: List[WordState],
-	verticalWords: List[WordState]
+	verticalWords:   List[WordState]
 ): Boolean = canPutWord(
 	word = wordState.word,
 	startRow = wordState.startRow,
@@ -83,7 +84,7 @@ def canPutWord(
  * @return true if the word can be placed without overlaps
  */
 
-private def canPutWordHorizontal(
+def canPutWordHorizontal(
 	word:            String,
 	startRow:        Int,
 	startColumn:     Int,
@@ -119,7 +120,7 @@ private def canPutWordHorizontal(
  * @return true if the word can be placed without overlaps
  */
 
-private def canPutWordVertical(
+def canPutWordVertical(
 	word:          String,
 	startRow:      Int,
 	startColumn:   Int,
