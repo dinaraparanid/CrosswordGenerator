@@ -1,10 +1,21 @@
 package presentation
 
-import java.awt.Rectangle
-import javax.swing.{JFrame, WindowConstants}
+import data.app.AppConfig
+import presentation.main_menu.MainMenu
+import zio.ZIO
 
-def MainFrame(): JFrame =
-  val frame = JFrame("Crossword Generator")
-  frame setDefaultCloseOperation WindowConstants.EXIT_ON_CLOSE
-  frame setBounds Rectangle(0, 0, 1900, 1000)
-  frame
+import javax.swing.{JFrame, JPanel, WindowConstants}
+
+def MainFrame(): ZIO[AppConfig, Nothing, JFrame] = {
+  def impl(mainMenu: JPanel): JFrame = {
+    new JFrame("Crossword Generator") {
+      setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
+      setBounds(0, 0, 1900, 1000)
+      add(mainMenu)
+    }
+  }
+
+  for {
+    mainMenu ← MainMenu()
+  } yield impl(mainMenu)
+}

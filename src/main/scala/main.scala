@@ -1,26 +1,30 @@
+import data.app.AppConfig
 import presentation.MainFrame
-import data.generation.population.TableState.showTable
-import cats.implicits.*
-import domain.generation.generation
+import presentation.ui.Themes
+import presentation.ui.theme
+import zio.{Promise, ZEnvironment, ZIO, ZIOAppDefault}
 
-@main
-def main(): Unit =
-  val words = List(
-    "akin",
-    "reduce",
-    "user",
-    "collar",
-    "city",
-    "issued",
-    "easily",
-    "exam",
-    "travel",
-    "arch",
-    "pencil",
-    "tabs",
-    "keeps",
-    "omits",
-    "neutral",
-  )
+object Application extends ZIOAppDefault:
+  private val appLogic: ZIO[AppConfig, Throwable, Unit] =
+    for {
+      _ ← runApplication()
+      _ ← waitUntilClosed()
+    } yield ()
 
-  println(generation(words, 20).show)
+  override def run: zio.IO[Throwable, Unit] =
+    appLogic provideEnvironment initialConfig()
+
+  private def runApplication(): ZIO[AppConfig, Throwable, Unit] =
+    for {
+      frame ← MainFrame()
+      _ ← ZIO attempt (frame setVisible true)
+    } yield ()
+
+  private def initialConfig(): ZEnvironment[AppConfig] =
+    ZEnvironment[AppConfig](AppConfig(theme = theme(Themes.Dark)))
+
+  private def waitUntilClosed(): ZIO[Any, Nothing, Unit] =
+    for {
+      closeEffect ← Promise.make[Nothing, Nothing]
+      _ ← closeEffect.await
+    } yield ()
