@@ -23,7 +23,7 @@ val EmptyLetter = '_'
  */
 
 def initialPopulation(words: List[String], tableSize: Int): Seq[TableState] =
-	LazyList continually { wordTable(words, tableSize) } take PopulationSize
+  LazyList continually { wordTable(words, tableSize) } take PopulationSize
 
 /**
  * Generates a table state with randomly placed words from a given list of words.
@@ -36,8 +36,8 @@ def initialPopulation(words: List[String], tableSize: Int): Seq[TableState] =
  */
 
 private def wordTable(words: List[String], tableSize: Int): TableState =
-	val table = emptyTable(tableSize)
-	TableState(table, wordStates(words, table))
+  val table = emptyTable(tableSize)
+  TableState(table, wordStates(words, table))
 
 /**
  * Constructs [[EmptyLetter]] squared table with given size
@@ -45,7 +45,7 @@ private def wordTable(words: List[String], tableSize: Int): TableState =
  */
 
 def emptyTable(tableSize: Int): Table =
-	Array.fill(tableSize) { Array.fill(tableSize)(EmptyLetter) }
+  Array.fill(tableSize) { Array.fill(tableSize)(EmptyLetter) }
 
 /**
  * Generates random positions for words,
@@ -60,21 +60,21 @@ def emptyTable(tableSize: Int): Table =
  */
 
 private def wordStates(words: List[String], table: Table): List[WordState] =
-	@tailrec
-	def impl(
-		words: List[String] = words,
-		ws:    List[WordState] = Nil,
-		hws:   List[WordState] = Nil,
-		vws:   List[WordState] = Nil
-	): (List[WordState], List[WordState], List[WordState]) =
-		words match
-			case Nil ⇒ (ws, hws, vws)
-			case head :: next ⇒
-				val w = wordState(head, table, hws, vws)
-				val (hw, vw) = putWord(w, table, hws, vws)
-				impl(next, w :: ws, hw, vw)
+  @tailrec
+  def impl(
+    words: List[String] = words,
+    ws:    List[WordState] = Nil,
+    hws:   List[WordState] = Nil,
+    vws:   List[WordState] = Nil
+  ): (List[WordState], List[WordState], List[WordState]) =
+    words match
+      case Nil ⇒ (ws, hws, vws)
+      case head :: next ⇒
+        val w = wordState(head, table, hws, vws)
+        val (hw, vw) = putWord(w, table, hws, vws)
+        impl(next, w :: ws, hw, vw)
 
-	impl()._1
+  impl()._1
 
 /**
  * Generates random position for the given word,
@@ -94,31 +94,31 @@ private def wordStates(words: List[String], table: Table): List[WordState] =
  */
 
 def wordState(
-	word:            String,
-	table:           Table,
-	horizontalWords: List[WordState],
-	verticalWords:   List[WordState],
+  word:            String,
+  table:           Table,
+  horizontalWords: List[WordState],
+  verticalWords:   List[WordState],
 )(using random: Random): WordState =
-	@tailrec
-	def impl(): WordState =
-		val layout = random.nextLayout
-		val Coords(row, column, _) = startCoords(word, table.length, layout)
+  @tailrec
+  def impl(): WordState =
+    val layout = random.nextLayout
+    val Coords(row, column, _) = startCoords(word, table.length, layout)
 
-		if tryPutWord(row, column, layout) then
-			return WordState(word, row, column, layout)
+    if tryPutWord(row, column, layout) then
+      return WordState(word, row, column, layout)
 
-		impl()
+    impl()
 
-	@inline
-	def tryPutWord(startRow: Int, startColumn: Int, layout: Layout): Boolean =
-		canPutWord(
-			word = word,
-			startRow = startRow,
-			startColumn = startColumn,
-			layout = layout,
-			table = table,
-			horizontalWords = horizontalWords,
-			verticalWords = verticalWords
-		)
+  @inline
+  def tryPutWord(startRow: Int, startColumn: Int, layout: Layout): Boolean =
+    canPutWord(
+      word = word,
+      startRow = startRow,
+      startColumn = startColumn,
+      layout = layout,
+      table = table,
+      horizontalWords = horizontalWords,
+      verticalWords = verticalWords
+    )
 
-	impl()
+  impl()

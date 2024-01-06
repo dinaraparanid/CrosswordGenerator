@@ -18,11 +18,11 @@ import domain.generation.selection.filters.followed
  */
 
 private def wordsFitnessStates(
-	wordStates:   List[WordState],
-	table:        Table,
-	wordsCrosses: WordsCrosses
+  wordStates:   List[WordState],
+  table:        Table,
+  wordsCrosses: WordsCrosses
 ): List[WordFitnessState] =
-	wordStates map (wordFitnessState(_, table, wordsCrosses))
+  wordStates map (wordFitnessState(_, table, wordsCrosses))
 
 /**
  * Calculates the fitness of each word,
@@ -37,11 +37,11 @@ private def wordsFitnessStates(
  */
 
 private def wordsFitness(
-	wordStates:   List[WordState],
-	table:        Table,
-	wordsCrosses: WordsCrosses
+  wordStates:   List[WordState],
+  table:        Table,
+  wordsCrosses: WordsCrosses
 ): List[Float] =
-	wordStates map (wordFitness(_, table, wordsCrosses))
+  wordStates map (wordFitness(_, table, wordsCrosses))
 
 /**
  * Constructs [[WordFitnessState]], applying [[wordFitness]]
@@ -55,14 +55,14 @@ private def wordsFitness(
  */
 
 private def wordFitnessState(
-	wordState:    WordState,
-	table:        Table,
-	wordsCrosses: WordsCrosses
+  wordState:    WordState,
+  table:        Table,
+  wordsCrosses: WordsCrosses
 ): WordFitnessState =
-	WordFitnessState(
-		word = wordState,
-		fitness = wordFitness(wordState, table, wordsCrosses)
-	)
+  WordFitnessState(
+    word = wordState,
+    fitness = wordFitness(wordState, table, wordsCrosses)
+  )
 
 /**
  * Calculates the word fitness based on the intersections.
@@ -76,12 +76,12 @@ private def wordFitnessState(
  */
 
 private def wordFitness(
-	wordState:    WordState,
-	table:        Table,
-	wordsCrosses: WordsCrosses
+  wordState:    WordState,
+  table:        Table,
+  wordsCrosses: WordsCrosses
 ): Float =
-	(crossed(wordState, wordsCrosses) + notFollowed(wordState, table))
-		/ FitnessWordCriteriaAmount
+  (crossed(wordState, wordsCrosses) + notFollowed(wordState, table))
+    / FitnessWordCriteriaAmount
 
 /**
  * Determines whether a given word intersects with any other word.
@@ -93,12 +93,12 @@ private def wordFitness(
  */
 
 private def crossed(
-	wordState:    WordState,
-	wordsCrosses: WordsCrosses
+  wordState:    WordState,
+  wordsCrosses: WordsCrosses
 ): Float =
-	if !(wordsCrosses contains wordState) then 0F
-	else if wordsCrosses(wordState).isEmpty then 0F
-	else MaxFitnessCriteriaWeight
+  if !(wordsCrosses contains wordState) then 0F
+  else if wordsCrosses(wordState).isEmpty then 0F
+  else MaxFitnessCriteriaWeight
 
 /**
  * Checks if the word is NOT adjacent with others.
@@ -110,4 +110,4 @@ private def crossed(
  */
 
 private def notFollowed(wordState: WordState, table: Table) =
-	if followed(wordState, table) then 0F else MaxFitnessCriteriaWeight
+  if followed(wordState, table) then 0F else MaxFitnessCriteriaWeight

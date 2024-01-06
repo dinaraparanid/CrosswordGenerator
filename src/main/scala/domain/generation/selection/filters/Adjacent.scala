@@ -11,16 +11,16 @@ import data.generation.population.WordState
  */
 
 def adjacentHorizontal(a: WordState, b: WordState): Boolean =
-	if a.startRow != b.startRow then
-		return false
+  if a.startRow != b.startRow then
+    return false
 
-	val aStart = a.startColumn
-	val aEnd = a.startColumn + a.word.length
+  val aStart = a.startColumn
+  val aEnd = a.startColumn + a.word.length
 
-	val bStart = b.startColumn
-	val bEnd = b.startColumn + b.word.length
+  val bStart = b.startColumn
+  val bEnd = b.startColumn + b.word.length
 
-	math.abs(aEnd - bStart) == 1 || math.abs(bEnd - aStart) == 1
+  math.abs(aEnd - bStart) == 1 || math.abs(bEnd - aStart) == 1
 
 /**
  * Checks whether two vertical words are directly adjacent to each other
@@ -31,13 +31,13 @@ def adjacentHorizontal(a: WordState, b: WordState): Boolean =
  */
 
 def adjacentVertical(a: WordState, b: WordState): Boolean =
-	if a.startColumn != b.startColumn then
-		return false
+  if a.startColumn != b.startColumn then
+    return false
 
-	val aStart = a.startRow
-	val aEnd = a.startRow + a.word.length
+  val aStart = a.startRow
+  val aEnd = a.startRow + a.word.length
 
-	val bStart = b.startRow
-	val bEnd = b.startRow + b.word.length
+  val bStart = b.startRow
+  val bEnd = b.startRow + b.word.length
 
-	math.abs(aEnd - bStart) == 1 || math.abs(bEnd - aStart) == 1
+  math.abs(aEnd - bStart) == 1 || math.abs(bEnd - aStart) == 1

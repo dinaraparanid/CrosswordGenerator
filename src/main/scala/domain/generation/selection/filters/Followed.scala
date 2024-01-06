@@ -13,13 +13,13 @@ import domain.generation.population.EmptyLetter
  */
 
 def followed(wordState: WordState, table: Table): Boolean =
-	followed(
-		word = wordState.word,
-		startRow = wordState.startRow,
-		startColumn = wordState.startColumn,
-		layout = wordState.layout,
-		table = table
-	)
+  followed(
+    word = wordState.word,
+    startRow = wordState.startRow,
+    startColumn = wordState.startColumn,
+    layout = wordState.layout,
+    table = table
+  )
 
 /**
  * Checks if the word is adjacent with others, but not crossed.
@@ -34,15 +34,15 @@ def followed(wordState: WordState, table: Table): Boolean =
  */
 
 def followed(
-	word:        String,
-	startRow:    Int,
-	startColumn: Int,
-	layout:      Layout,
-	table:       Table
+  word:        String,
+  startRow:    Int,
+  startColumn: Int,
+  layout:      Layout,
+  table:       Table
 ): Boolean =
-	layout match
-		case Layout.HORIZONTAL ⇒ followedHorizontal(word, startRow, startColumn, table)
-		case Layout.VERTICAL ⇒ followedVertical(word, startRow, startColumn, table)
+  layout match
+    case Layout.HORIZONTAL ⇒ followedHorizontal(word, startRow, startColumn, table)
+    case Layout.VERTICAL ⇒ followedVertical(word, startRow, startColumn, table)
 
 /**
  * Checks if the horizontal word is adjacent with others, but not crossed.
@@ -56,19 +56,19 @@ def followed(
  */
 
 def followedHorizontal(
-	word:        String,
-	startRow:    Int,
-	startColumn: Int,
-	table:       Table
+  word:        String,
+  startRow:    Int,
+  startColumn: Int,
+  table:       Table
 ): Boolean =
-	if startColumn > 0 then
-		if table(startRow)(startColumn - 1) != EmptyLetter then
-			return true
+  if startColumn > 0 then
+    if table(startRow)(startColumn - 1) != EmptyLetter then
+      return true
 
-	if startColumn + word.length + 1 < table.length then
-		return table(startRow)(startColumn + word.length) != EmptyLetter
+  if startColumn + word.length + 1 < table.length then
+    return table(startRow)(startColumn + word.length) != EmptyLetter
 
-	false
+  false
 
 /**
  * Checks if the vertical word is adjacent with others, but not crossed.
@@ -82,16 +82,16 @@ def followedHorizontal(
  */
 
 def followedVertical(
-	word:        String,
-	startRow:    Int,
-	startColumn: Int,
-	table:       Table
+  word:        String,
+  startRow:    Int,
+  startColumn: Int,
+  table:       Table
 ): Boolean =
-	if startRow > 0 then
-		if table(startRow - 1)(startColumn) != EmptyLetter then
-			return true
+  if startRow > 0 then
+    if table(startRow - 1)(startColumn) != EmptyLetter then
+      return true
 
-	if startRow + word.length + 1 < table.length then
-		return table(startRow + word.length)(startColumn) != EmptyLetter
+  if startRow + word.length + 1 < table.length then
+    return table(startRow + word.length)(startColumn) != EmptyLetter
 
-	false
+  false

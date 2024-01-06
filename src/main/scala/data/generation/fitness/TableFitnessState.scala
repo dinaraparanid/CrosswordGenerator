@@ -12,27 +12,27 @@ import data.generation.population.TableState
  */
 
 case class TableFitnessState(
-	table:        TableState,
-	wordsFitness: List[WordFitnessState],
-	graphFitness: Float
+  table:        TableState,
+  wordsFitness: List[WordFitnessState],
+  graphFitness: Float
 ):
-	/**
-	 * Calculates the total table's fitness,
-	 * which is the sum of graph fitness
-	 * and the average of the words' fitness
-	 *
-	 * @return the total fitness score of the table
-	 */
+  /**
+   * Calculates the total table's fitness,
+   * which is the sum of graph fitness
+   * and the average of the words' fitness
+   *
+   * @return the total fitness score of the table
+   */
 
-	def totalFitness: Float =
-		graphFitness + (totalWordsFitness / wordsFitness.length)
+  def totalFitness: Float =
+    graphFitness + (totalWordsFitness / wordsFitness.length)
 
-	/**
-	 * Calculates the sum of the words' fitness
-	 *
-	 * @return The sum of the words' fitness
-	 * @see [[totalFitness]]
-	 */
+  /**
+   * Calculates the sum of the words' fitness
+   *
+   * @return The sum of the words' fitness
+   * @see [[totalFitness]]
+   */
 
-	private def totalWordsFitness: Float =
-		wordsFitness.map(_.fitness).sum
+  private def totalWordsFitness: Float =
+    wordsFitness.map(_.fitness).sum

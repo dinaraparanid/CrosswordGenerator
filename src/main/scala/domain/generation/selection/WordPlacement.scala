@@ -20,29 +20,29 @@ import domain.generation.selection.filters.*
  */
 
 def canPutWord(
-	word:            String,
-	startRow:        Int,
-	startColumn:     Int,
-	layout:          Layout,
-	table:           Table,
-	horizontalWords: List[WordState],
-	verticalWords:   List[WordState]
+  word:            String,
+  startRow:        Int,
+  startColumn:     Int,
+  layout:          Layout,
+  table:           Table,
+  horizontalWords: List[WordState],
+  verticalWords:   List[WordState]
 ): Boolean = layout match
-	case Layout.HORIZONTAL ⇒ canPutWordHorizontal(
-		word = word,
-		startRow = startRow,
-		startColumn = startColumn,
-		table = table,
-		horizontalWords = horizontalWords
-	)
+  case Layout.HORIZONTAL ⇒ canPutWordHorizontal(
+    word = word,
+    startRow = startRow,
+    startColumn = startColumn,
+    table = table,
+    horizontalWords = horizontalWords
+  )
 
-	case Layout.VERTICAL ⇒ canPutWordVertical(
-		word = word,
-		startRow = startRow,
-		startColumn = startColumn,
-		table = table,
-		verticalWords = verticalWords
-	)
+  case Layout.VERTICAL ⇒ canPutWordVertical(
+    word = word,
+    startRow = startRow,
+    startColumn = startColumn,
+    table = table,
+    verticalWords = verticalWords
+  )
 
 /**
  * Checks if the word can be placed in the table
@@ -57,18 +57,18 @@ def canPutWord(
  */
 
 def canPutWord(
-	wordState:       WordState,
-	table:           Table,
-	horizontalWords: List[WordState],
-	verticalWords:   List[WordState]
+  wordState:       WordState,
+  table:           Table,
+  horizontalWords: List[WordState],
+  verticalWords:   List[WordState]
 ): Boolean = canPutWord(
-	word = wordState.word,
-	startRow = wordState.startRow,
-	startColumn = wordState.startColumn,
-	layout = wordState.layout,
-	table = table,
-	horizontalWords = horizontalWords,
-	verticalWords = verticalWords
+  word = wordState.word,
+  startRow = wordState.startRow,
+  startColumn = wordState.startColumn,
+  layout = wordState.layout,
+  table = table,
+  horizontalWords = horizontalWords,
+  verticalWords = verticalWords
 )
 
 /**
@@ -85,27 +85,27 @@ def canPutWord(
  */
 
 def canPutWordHorizontal(
-	word:            String,
-	startRow:        Int,
-	startColumn:     Int,
-	table:           Table,
-	horizontalWords: List[WordState],
+  word:            String,
+  startRow:        Int,
+  startColumn:     Int,
+  table:           Table,
+  horizontalWords: List[WordState],
 ): Boolean =
-	if startColumn + word.length >= table.length then
-		return false
+  if startColumn + word.length >= table.length then
+    return false
 
-	if followedHorizontal(word, startRow, startColumn, table) then
-		return false
+  if followedHorizontal(word, startRow, startColumn, table) then
+    return false
 
-	if hasOverlapsHorizontal(word, startRow, startColumn, table) then
-		return false
+  if hasOverlapsHorizontal(word, startRow, startColumn, table) then
+    return false
 
-	val wordState = WordState(word, startRow, startColumn, layout = HORIZONTAL)
+  val wordState = WordState(word, startRow, startColumn, layout = HORIZONTAL)
 
-	horizontalWords forall { w ⇒
-		!tooBigNeighbouringBorderHorizontal(wordState, w) &&
-			!adjacentHorizontal(wordState, w)
-	}
+  horizontalWords forall { w ⇒
+    !tooBigNeighbouringBorderHorizontal(wordState, w) &&
+      !adjacentHorizontal(wordState, w)
+  }
 
 /**
  * Checks if the word can be placed vertically
@@ -121,25 +121,25 @@ def canPutWordHorizontal(
  */
 
 def canPutWordVertical(
-	word:          String,
-	startRow:      Int,
-	startColumn:   Int,
-	table:         Table,
-	verticalWords: List[WordState],
+  word:          String,
+  startRow:      Int,
+  startColumn:   Int,
+  table:         Table,
+  verticalWords: List[WordState],
 ): Boolean = {
-	if startRow + word.length >= table.length then
-		return false
+  if startRow + word.length >= table.length then
+    return false
 
-	if followedVertical(word, startRow, startColumn, table) then
-		return false
+  if followedVertical(word, startRow, startColumn, table) then
+    return false
 
-	if hasOverlapsVertical(word, startRow, startColumn, table) then
-		return false
+  if hasOverlapsVertical(word, startRow, startColumn, table) then
+    return false
 
-	val wordState = WordState(word, startRow, startColumn, layout = VERTICAL)
+  val wordState = WordState(word, startRow, startColumn, layout = VERTICAL)
 
-	verticalWords forall { w ⇒
-		!tooBigNeighbouringBorderVertical(wordState, w) &&
-			!adjacentVertical(wordState, w)
-	}
+  verticalWords forall { w ⇒
+    !tooBigNeighbouringBorderVertical(wordState, w) &&
+      !adjacentVertical(wordState, w)
+  }
 }

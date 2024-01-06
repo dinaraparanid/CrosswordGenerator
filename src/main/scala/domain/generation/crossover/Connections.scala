@@ -17,10 +17,10 @@ type LetterMap = Map[Char, Seq[Coords]]
  */
 
 private def possibleConnections(
-	word:          String,
-	directedWords: List[WordState]
+  word:          String,
+  directedWords: List[WordState]
 ): List[Coords] =
-	directedWords map letterMap flatMap filterLetterMap(word)
+  directedWords map letterMap flatMap filterLetterMap(word)
 
 /**
  * Filters coordinates of characters in the map that are present in word
@@ -32,7 +32,7 @@ private def possibleConnections(
  */
 
 private def filterLetterMap(word: String)(letterMap: LetterMap): Seq[Coords] =
-	word.flatMap(letterMap.get).flatten
+  word.flatMap(letterMap.get).flatten
 
 /**
  * Produces the coordinate map for a word,
@@ -46,9 +46,9 @@ private def filterLetterMap(word: String)(letterMap: LetterMap): Seq[Coords] =
  */
 
 private def letterMap(wordState: WordState): LetterMap =
-	wordState.layout match
-		case Layout.HORIZONTAL ⇒ letterMapHorizontal(wordState)
-		case Layout.VERTICAL ⇒ letterMapVertical(wordState)
+  wordState.layout match
+    case Layout.HORIZONTAL ⇒ letterMapHorizontal(wordState)
+    case Layout.VERTICAL ⇒ letterMapVertical(wordState)
 
 /**
  * Produces the coordinate map for a horizontal word,
@@ -62,8 +62,8 @@ private def letterMap(wordState: WordState): LetterMap =
  */
 
 private def letterMapHorizontal(wordState: WordState): LetterMap =
-	val WordState(word, row, column, _) = wordState
-	letterMap(column, word) { (c, letter) ⇒ Coords(row, c, letter) }
+  val WordState(word, row, column, _) = wordState
+  letterMap(column, word) { (c, letter) ⇒ Coords(row, c, letter) }
 
 /**
  * Produces the coordinate map for a vertical word,
@@ -77,8 +77,8 @@ private def letterMapHorizontal(wordState: WordState): LetterMap =
  */
 
 private def letterMapVertical(wordState: WordState): LetterMap =
-	val WordState(word, row, column, _) = wordState
-	letterMap(row, word) { (r, letter) ⇒ Coords(r, column, letter) }
+  val WordState(word, row, column, _) = wordState
+  letterMap(row, word) { (r, letter) ⇒ Coords(r, column, letter) }
 
 /**
  * Produces the coordinate map for a word,
@@ -96,7 +96,7 @@ private def letterMapVertical(wordState: WordState): LetterMap =
 
 @inline
 private def letterMap(start: Int, word: String)(f: (Int, Char) ⇒ Coords): LetterMap =
-	(start until start + word.length)
-		.zip(word)
-		.map { case (col, letter) ⇒ f(col, letter) }
-		.groupMap(_.letter)(identity)
+  (start until start + word.length)
+    .zip(word)
+    .map { case (col, letter) ⇒ f(col, letter) }
+    .groupMap(_.letter)(identity)

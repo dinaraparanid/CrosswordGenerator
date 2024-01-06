@@ -21,8 +21,8 @@ type WordsCrosses = Map[WordState, Set[WordState]]
 
 
 def wordsCrosses(wordStates: List[WordState]): WordsCrosses =
-	val coords = wordsCoords(wordStates)
-	wordsCrosses(coords)
+  val coords = wordsCoords(wordStates)
+  wordsCrosses(coords)
 
 /**
  * Creates a map associating each word with the set of word it intersects with
@@ -34,9 +34,9 @@ def wordsCrosses(wordStates: List[WordState]): WordsCrosses =
  */
 
 private def wordsCrosses(wordsCoords: Map[WordState, Set[Coords]]): WordsCrosses =
-	wordsCoords map { case (word, coords) ⇒
-		(word, crosses(word, coords, wordsCoords))
-	}
+  wordsCoords map { case (word, coords) ⇒
+    (word, crosses(word, coords, wordsCoords))
+  }
 
 /**
  * Determines the word states that intersect
@@ -49,11 +49,11 @@ private def wordsCrosses(wordsCoords: Map[WordState, Set[Coords]]): WordsCrosses
  */
 
 private def crosses(
-	wordState:   WordState,
-	coords:      Set[Coords],
-	wordsCoords: Map[WordState, Set[Coords]]
+  wordState:   WordState,
+  coords:      Set[Coords],
+  wordsCoords: Map[WordState, Set[Coords]]
 ): Set[WordState] =
-	wordsCoords
-		.filter { case (word, _) ⇒ word != wordState }
-		.filter { case (_, crds) ⇒ crds exists coords.contains }
-		.keySet
+  wordsCoords
+    .filter { case (word, _) ⇒ word != wordState }
+    .filter { case (_, crds) ⇒ crds exists coords.contains }
+    .keySet

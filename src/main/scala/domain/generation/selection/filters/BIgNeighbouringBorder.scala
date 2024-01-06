@@ -14,13 +14,13 @@ import domain.generation.selection.{columnSet, rowSet}
  */
 
 def tooBigNeighbouringBorderHorizontal(a: WordState, b: WordState): Boolean =
-	if math.abs(a.startRow - b.startRow) != 1 then
-		return false
+  if math.abs(a.startRow - b.startRow) != 1 then
+    return false
 
-	val aCoords = columnSet(a)
-	val bCoords = columnSet(b)
+  val aCoords = columnSet(a)
+  val bCoords = columnSet(b)
 
-	(aCoords & bCoords).sizeIs > 1
+  (aCoords & bCoords).sizeIs > 1
 
 /**
  * Checks whether two vertical word states
@@ -33,10 +33,10 @@ def tooBigNeighbouringBorderHorizontal(a: WordState, b: WordState): Boolean =
  */
 
 def tooBigNeighbouringBorderVertical(a: WordState, b: WordState): Boolean =
-	if math.abs(a.startColumn - b.startColumn) != 1 then
-		return false
+  if math.abs(a.startColumn - b.startColumn) != 1 then
+    return false
 
-	val aCoords = rowSet(a)
-	val bCoords = rowSet(b)
+  val aCoords = rowSet(a)
+  val bCoords = rowSet(b)
 
-	(aCoords & bCoords).sizeIs > 1
+  (aCoords & bCoords).sizeIs > 1

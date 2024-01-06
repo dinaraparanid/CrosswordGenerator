@@ -15,14 +15,14 @@ import domain.generation.population.EmptyLetter
  */
 
 def hasOverlapsHorizontal(
-	word:        String,
-	startRow:    Int,
-	startColumn: Int,
-	table:       Table
+  word:        String,
+  startRow:    Int,
+  startColumn: Int,
+  table:       Table
 ): Boolean = (startColumn until startColumn + word.length)
-	.map(table(startRow))
-	.zip(word)
-	.exists { case (tab, w) ⇒ tab != EmptyLetter && tab != w }
+  .map(table(startRow))
+  .zip(word)
+  .exists { case (tab, w) ⇒ tab != EmptyLetter && tab != w }
 
 /**
  * Checks whether a vertical word state
@@ -36,11 +36,11 @@ def hasOverlapsHorizontal(
  */
 
 def hasOverlapsVertical(
-	word:        String,
-	startRow:    Int,
-	startColumn: Int,
-	table:       Table
+  word:        String,
+  startRow:    Int,
+  startColumn: Int,
+  table:       Table
 ): Boolean = (startRow until startRow + word.length)
-	.map { table(_)(startColumn) }
-	.zip { word }
-	.exists { case (tab, w) ⇒ tab != EmptyLetter && tab != w }
+  .map { table(_)(startColumn) }
+  .zip { word }
+  .exists { case (tab, w) ⇒ tab != EmptyLetter && tab != w }

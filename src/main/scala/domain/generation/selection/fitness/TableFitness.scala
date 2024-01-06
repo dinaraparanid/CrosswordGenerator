@@ -15,7 +15,7 @@ private val MaxFitnessCriteriaWeight = 1F
  */
 
 def maxFitness(population: Seq[TableState]): (Float, Int) =
-	maxFitnessFromValues(fitnessValues(population))
+  maxFitnessFromValues(fitnessValues(population))
 
 /**
  * Calculates maximum fitness value with corresponding index
@@ -25,7 +25,7 @@ def maxFitness(population: Seq[TableState]): (Float, Int) =
  */
 
 private def maxFitnessFromValues(fitnessValues: Seq[Float]): (Float, Int) =
-	fitnessValues.zipWithIndex.maxOption.getOrElse((0F, 0))
+  fitnessValues.zipWithIndex.maxOption.getOrElse((0F, 0))
 
 /**
  * Calculates the fitness prefix sums for a given population
@@ -35,7 +35,7 @@ private def maxFitnessFromValues(fitnessValues: Seq[Float]): (Float, Int) =
  */
 
 def fitnessSums(population: Seq[TableState]): Seq[Float] =
-	fitnessSumsFromValues(fitnessValues(population))
+  fitnessSumsFromValues(fitnessValues(population))
 
 /**
  * Calculates the fitness prefix sums for a given list of fitness states
@@ -45,7 +45,7 @@ def fitnessSums(population: Seq[TableState]): Seq[Float] =
  */
 
 def fitnessSumsFromStates(states: Seq[TableFitnessState]) =
-	fitnessSumsFromValues(fitnessValuesFromStates(states))
+  fitnessSumsFromValues(fitnessValuesFromStates(states))
 
 /**
  * Calculates the fitness state of each table state in a given population
@@ -55,7 +55,7 @@ def fitnessSumsFromStates(states: Seq[TableFitnessState]) =
  */
 
 def fitnessStates(population: Seq[TableState]): Seq[TableFitnessState] =
-	population map fitnessState
+  population map fitnessState
 
 /**
  * Extracts the fitness values from the population
@@ -65,7 +65,7 @@ def fitnessStates(population: Seq[TableState]): Seq[TableFitnessState] =
  */
 
 private def fitnessValues(population: Seq[TableState]): Seq[Float] =
-	fitnessValuesFromStates(fitnessStates(population))
+  fitnessValuesFromStates(fitnessStates(population))
 
 /**
  * Extracts the fitness values from a list of table fitness states
@@ -75,7 +75,7 @@ private def fitnessValues(population: Seq[TableState]): Seq[Float] =
  */
 
 private def fitnessValuesFromStates(fitnessStates: Seq[TableFitnessState]): Seq[Float] =
-	fitnessStates map (_.totalFitness)
+  fitnessStates map (_.totalFitness)
 
 /**
  * Calculates the fitness prefix sums for a given list of fitness values
@@ -85,7 +85,7 @@ private def fitnessValuesFromStates(fitnessStates: Seq[TableFitnessState]): Seq[
  */
 
 private def fitnessSumsFromValues(fitnessVals: Seq[Float]): Seq[Float] =
-	fitnessVals.scan(0F) { _ + _ }.tail
+  fitnessVals.scan(0F) { _ + _ }.tail
 
 /**
  * Calculates the fitness of a given table
@@ -96,10 +96,10 @@ private def fitnessSumsFromValues(fitnessVals: Seq[Float]): Seq[Float] =
  */
 
 private def fitnessState(tableState: TableState): TableFitnessState =
-	val TableState(table, wordStates) = tableState
-	val coords = wordsCoords(wordStates)
-	val crosses = wordsCrosses(coords)
-	val fitness = wordsFitnessStates(wordStates, table, crosses)
-	val connectivity = longestConnectivity(crosses).toFloat
-	val graphConnectivity = connectivity / wordStates.length
-	TableFitnessState(tableState, fitness, graphConnectivity)
+  val TableState(table, wordStates) = tableState
+  val coords = wordsCoords(wordStates)
+  val crosses = wordsCrosses(coords)
+  val fitness = wordsFitnessStates(wordStates, table, crosses)
+  val connectivity = longestConnectivity(crosses).toFloat
+  val graphConnectivity = connectivity / wordStates.length
+  TableFitnessState(tableState, fitness, graphConnectivity)

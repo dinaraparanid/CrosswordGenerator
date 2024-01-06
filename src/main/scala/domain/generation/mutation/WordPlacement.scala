@@ -15,22 +15,22 @@ import scala.annotation.tailrec
  */
 
 private def putWords(
-	wordStates: List[WordState],
-	table:      Table
+  wordStates: List[WordState],
+  table:      Table
 ): (List[WordState], List[WordState]) =
-	@tailrec
-	def impl(
-		ws:  List[WordState] = wordStates,
-		hws: List[WordState] = Nil,
-		vws: List[WordState] = Nil
-	): (List[WordState], List[WordState]) =
-		ws match
-			case Nil ⇒ (hws, vws)
-			case head :: next ⇒
-				val (hw, vw) = putWord(head, table, hws, vws)
-				impl(next, hw, vw)
+  @tailrec
+  def impl(
+    ws:  List[WordState] = wordStates,
+    hws: List[WordState] = Nil,
+    vws: List[WordState] = Nil
+  ): (List[WordState], List[WordState]) =
+    ws match
+      case Nil ⇒ (hws, vws)
+      case head :: next ⇒
+        val (hw, vw) = putWord(head, table, hws, vws)
+        impl(next, hw, vw)
 
-	impl()
+  impl()
 
 /**
  * Associates words with corresponding word states
@@ -38,4 +38,4 @@ private def putWords(
  */
 
 def wordStatesMap(wordStates: List[WordState]): Map[String, WordState] =
-	wordStates.map { ws ⇒ (ws.word, ws) }.toMap
+  wordStates.map { ws ⇒ (ws.word, ws) }.toMap

@@ -18,6 +18,6 @@ type Table = Array[Array[Char]]
 case class TableState(table: Table, words: List[WordState])
 
 object TableState:
-	given showTable: Show[TableState] = Show.show {
-		_.table map { _ mkString " " } mkString "\n"
-	}
+  given showTable: Show[TableState] = Show.show {
+    _.table map { _ mkString " " } mkString "\n"
+  }

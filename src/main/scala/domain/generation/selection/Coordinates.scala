@@ -12,7 +12,7 @@ import data.generation.population.{Coords, Layout, WordState}
  */
 
 private def wordsCoords(wordStates: List[WordState]): Map[WordState, Set[Coords]] =
-	wordStates.map { word ⇒ (word, wordCoords(word)) }.toMap
+  wordStates.map { word ⇒ (word, wordCoords(word)) }.toMap
 
 /**
  * Retrieves the coordinates of a word for every symbol based on its layout
@@ -23,9 +23,9 @@ private def wordsCoords(wordStates: List[WordState]): Map[WordState, Set[Coords]
  */
 
 private def wordCoords(wordState: WordState): Set[Coords] =
-	wordState.layout match
-		case Layout.HORIZONTAL ⇒ wordCoordsHorizontal(wordState)
-		case Layout.VERTICAL ⇒ wordCoordsVertical(wordState)
+  wordState.layout match
+    case Layout.HORIZONTAL ⇒ wordCoordsHorizontal(wordState)
+    case Layout.VERTICAL ⇒ wordCoordsVertical(wordState)
 
 /**
  * Retrieves the coordinates of a horizontally-placed word for every symbol
@@ -36,9 +36,9 @@ private def wordCoords(wordState: WordState): Set[Coords] =
  */
 
 private def wordCoordsHorizontal(wordState: WordState): Set[Coords] =
-	(wordState.startColumn until wordState.startColumn + wordState.word.length)
-		.map { c ⇒ Coords(wordState.startRow, c, wordState.word(c - wordState.startColumn)) }
-		.toSet
+  (wordState.startColumn until wordState.startColumn + wordState.word.length)
+    .map { c ⇒ Coords(wordState.startRow, c, wordState.word(c - wordState.startColumn)) }
+    .toSet
 
 /**
  * Retrieves the coordinates of a vertically-placed word for every symbol
@@ -49,9 +49,9 @@ private def wordCoordsHorizontal(wordState: WordState): Set[Coords] =
  */
 
 private def wordCoordsVertical(wordState: WordState): Set[Coords] =
-	(wordState.startRow until wordState.startRow + wordState.word.length)
-		.map { r ⇒ Coords(r, wordState.startColumn, wordState.word(r - wordState.startRow)) }
-		.toSet
+  (wordState.startRow until wordState.startRow + wordState.word.length)
+    .map { r ⇒ Coords(r, wordState.startColumn, wordState.word(r - wordState.startRow)) }
+    .toSet
 
 /**
  * Extracts the set of column coordinates
@@ -62,7 +62,7 @@ private def wordCoordsVertical(wordState: WordState): Set[Coords] =
  */
 
 private def columnSet(wordState: WordState): Set[Int] =
-	wordCoords(wordState) map (_.column)
+  wordCoords(wordState) map (_.column)
 
 /**
  * Extracts the set of rows coordinates
@@ -73,4 +73,4 @@ private def columnSet(wordState: WordState): Set[Int] =
  */
 
 private def rowSet(wordState: WordState): Set[Int] =
-	wordCoords(wordState) map (_.row)
+  wordCoords(wordState) map (_.row)

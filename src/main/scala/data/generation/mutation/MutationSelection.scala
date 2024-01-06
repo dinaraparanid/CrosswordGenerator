@@ -11,6 +11,6 @@ import data.generation.population.WordState
  */
 
 case class MutationSelection(
-	mutatedWords: List[WordState],
-	notMutatedWords: List[WordState]
+  mutatedWords: List[WordState],
+  notMutatedWords: List[WordState]
 )

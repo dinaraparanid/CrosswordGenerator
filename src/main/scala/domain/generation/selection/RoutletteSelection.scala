@@ -17,21 +17,21 @@ import scala.util.Random
  */
 
 def selectWithRoulette(population: Seq[TableState])(using random: Random): Seq[TableState] =
-	val states = fitnessStates(population)
-	val sums = fitnessSumsFromStates(states)
-	val totalFitness = sums.last
-	val rouletteValue = random nextRouletteValue totalFitness
+  val states = fitnessStates(population)
+  val sums = fitnessSumsFromStates(states)
+  val totalFitness = sums.last
+  val rouletteValue = random nextRouletteValue totalFitness
 
-	sums
-		.zip(states)
-		.filter { case (fitness, _) ⇒ fitness > rouletteValue }
-		.map { case (_, tableSt) ⇒ tableSt.table }
+  sums
+    .zip(states)
+    .filter { case (fitness, _) ⇒ fitness > rouletteValue }
+    .map { case (_, tableSt) ⇒ tableSt.table }
 
 extension (random: Random)
-	/**
-	 * Generates roulette value for the selection process
-	 * @return value in range [0 until [[totalFitness]]]
-	 */
+  /**
+   * Generates roulette value for the selection process
+   * @return value in range [0 until [[totalFitness]]]
+   */
 
-	def nextRouletteValue(totalFitness: Float): Float =
-		random.between(0, totalFitness)
+  def nextRouletteValue(totalFitness: Float): Float =
+    random.between(0, totalFitness)

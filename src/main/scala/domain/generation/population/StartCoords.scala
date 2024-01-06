@@ -16,9 +16,9 @@ import scala.util.Random
  */
 
 def startCoords(word: String, tableSize: Int, layout: Layout): Coords =
-	layout match
-		case Layout.HORIZONTAL ⇒ startCoordsHorizontal(word, tableSize)
-		case Layout.VERTICAL ⇒ startCoordsVertical(word, tableSize)
+  layout match
+    case Layout.HORIZONTAL ⇒ startCoordsHorizontal(word, tableSize)
+    case Layout.VERTICAL ⇒ startCoordsVertical(word, tableSize)
 
 /**
  * Generates the starting coordinates for placing a word in the table in horizontal position.
@@ -30,9 +30,9 @@ def startCoords(word: String, tableSize: Int, layout: Layout): Coords =
  */
 
 private def startCoordsHorizontal(word: String, tableSize: Int)(using random: Random): Coords =
-	val startRow = random nextInt tableSize
-	val startColumn = random nextInt (tableSize - word.length + 1)
-	Coords(startRow, startColumn, EmptyLetter)
+  val startRow = random nextInt tableSize
+  val startColumn = random nextInt (tableSize - word.length + 1)
+  Coords(startRow, startColumn, EmptyLetter)
 
 /**
  * Generates the starting coordinates for placing a word in the table in vertical position.
@@ -44,6 +44,6 @@ private def startCoordsHorizontal(word: String, tableSize: Int)(using random: Ra
  */
 
 private def startCoordsVertical(word: String, tableSize: Int)(using random: Random): Coords =
-	val startRow = random nextInt (tableSize - word.length + 1)
-	val startColumn = random nextInt tableSize
-	Coords(startRow, startColumn, EmptyLetter)
+  val startRow = random nextInt (tableSize - word.length + 1)
+  val startColumn = random nextInt tableSize
+  Coords(startRow, startColumn, EmptyLetter)

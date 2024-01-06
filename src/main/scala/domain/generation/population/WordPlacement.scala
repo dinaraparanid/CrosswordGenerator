@@ -14,17 +14,17 @@ import data.generation.population.{Layout, Table, WordState}
  */
 
 def putWord(
-	wordState:       WordState,
-	table:           Table,
-	horizontalWords: List[WordState],
-	verticalWords:   List[WordState]
+  wordState:       WordState,
+  table:           Table,
+  horizontalWords: List[WordState],
+  verticalWords:   List[WordState]
 ): (List[WordState], List[WordState]) =
-	wordState.layout match
-		case Layout.HORIZONTAL ⇒
-			(putWordHorizontal(wordState, table, horizontalWords), verticalWords)
+  wordState.layout match
+    case Layout.HORIZONTAL ⇒
+      (putWordHorizontal(wordState, table, horizontalWords), verticalWords)
 
-		case Layout.VERTICAL ⇒
-			(horizontalWords, putWordVertical(wordState, table, verticalWords))
+    case Layout.VERTICAL ⇒
+      (horizontalWords, putWordVertical(wordState, table, verticalWords))
 
 /**
  * Places a word with the given positions horizontally into the table
@@ -37,13 +37,13 @@ def putWord(
  */
 
 private def putWordHorizontal(
-	wordState:       WordState,
-	table:           Table,
-	horizontalWords: List[WordState],
+  wordState:       WordState,
+  table:           Table,
+  horizontalWords: List[WordState],
 ): List[WordState] =
-	val WordState(word, row, column, _) = wordState
-	(column until column + word.length) foreach { c ⇒ table(row)(c) = word(c - column) }
-	wordState :: horizontalWords
+  val WordState(word, row, column, _) = wordState
+  (column until column + word.length) foreach { c ⇒ table(row)(c) = word(c - column) }
+  wordState :: horizontalWords
 
 /**
  * Places a word with the given positions vertically into the table
@@ -56,10 +56,10 @@ private def putWordHorizontal(
  */
 
 private def putWordVertical(
-	wordState:     WordState,
-	table:         Table,
-	verticalWords: List[WordState],
+  wordState:     WordState,
+  table:         Table,
+  verticalWords: List[WordState],
 ): List[WordState] =
-	val WordState(word, row, column, _) = wordState
-	(row until row + word.length) foreach { r ⇒ table(r)(column) = word(r - row) }
-	wordState :: verticalWords
+  val WordState(word, row, column, _) = wordState
+  (row until row + word.length) foreach { r ⇒ table(r)(column) = word(r - row) }
+  wordState :: verticalWords

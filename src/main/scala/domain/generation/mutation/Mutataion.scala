@@ -25,19 +25,19 @@ private val MutationRate = 0.33F
  */
 
 def mutation(tableState: TableState) =
-	val TableState(table, words) = tableState
-	val newTable = emptyTable(table.length)
+  val TableState(table, words) = tableState
+  val newTable = emptyTable(table.length)
 
-	val components = connectivityComponents(words)
-	val MutationSelection(mutated, notMutated) = mutationSelection(components)
+  val components = connectivityComponents(words)
+  val MutationSelection(mutated, notMutated) = mutationSelection(components)
 
-	val (hw, vw) = putWords(notMutated, newTable)
-	var wordMap = wordStatesMap(notMutated)
+  val (hw, vw) = putWords(notMutated, newTable)
+  var wordMap = wordStatesMap(notMutated)
 
-	val (mergedNew, _, _) = mergedOrNew(mutated, newTable, hw, vw)
-	wordMap ++= wordStatesMap(mergedNew)
+  val (mergedNew, _, _) = mergedOrNew(mutated, newTable, hw, vw)
+  wordMap ++= wordStatesMap(mergedNew)
 
-	TableState(newTable, reorderedWordStates(words, wordMap))
+  TableState(newTable, reorderedWordStates(words, wordMap))
 
 /**
  * Choose connectivity components whose words
@@ -50,26 +50,26 @@ def mutation(tableState: TableState) =
  */
 
 private def mutationSelection(
-	components: List[Set[WordState]]
+  components: List[Set[WordState]]
 )(using random: Random): MutationSelection = {
-	@tailrec
-	def impl(
-		comps:      List[Set[WordState]] = components,
-		mutated:    List[WordState] = Nil,
-		notMutated: List[WordState] = Nil
-	): (List[WordState], List[WordState]) =
-		comps match
-			case Nil ⇒ (mutated, notMutated)
+  @tailrec
+  def impl(
+    comps:      List[Set[WordState]] = components,
+    mutated:    List[WordState] = Nil,
+    notMutated: List[WordState] = Nil
+  ): (List[WordState], List[WordState]) =
+    comps match
+      case Nil ⇒ (mutated, notMutated)
 
-			case head :: next
-				if random.nextMutationRate <= MutationRate ⇒
-				impl(next, mutated ++ head, notMutated)
+      case head :: next
+        if random.nextMutationRate <= MutationRate ⇒
+        impl(next, mutated ++ head, notMutated)
 
-			case head :: next ⇒
-				impl(next, mutated, notMutated ++ head)
+      case head :: next ⇒
+        impl(next, mutated, notMutated ++ head)
 
-	val (mutatedWords, notMutatedWords) = impl()
-	MutationSelection(mutatedWords, notMutatedWords)
+  val (mutatedWords, notMutatedWords) = impl()
+  MutationSelection(mutatedWords, notMutatedWords)
 }
 
 /**
@@ -87,28 +87,28 @@ private def mutationSelection(
  */
 
 private def mergedOrNew(
-	wordsStates:     List[WordState],
-	table:           Table,
-	horizontalWords: List[WordState],
-	verticalWords:   List[WordState]
+  wordsStates:     List[WordState],
+  table:           Table,
+  horizontalWords: List[WordState],
+  verticalWords:   List[WordState]
 ): (List[WordState], List[WordState], List[WordState]) =
-	@tailrec
-	def impl(
-		words: List[WordState] = wordsStates,
-		ws:    List[WordState] = Nil,
-		hws:   List[WordState] = horizontalWords,
-		vws:   List[WordState] = verticalWords
-	): (List[WordState], List[WordState], List[WordState]) =
-		words match
-			case Nil ⇒ (ws, hws, vws)
-			case head :: next ⇒
-				val w = tryPutCrossing(head, table, hws, vws) getOrElse
-					wordState(head.word, table, hws, vws)
+  @tailrec
+  def impl(
+    words: List[WordState] = wordsStates,
+    ws:    List[WordState] = Nil,
+    hws:   List[WordState] = horizontalWords,
+    vws:   List[WordState] = verticalWords
+  ): (List[WordState], List[WordState], List[WordState]) =
+    words match
+      case Nil ⇒ (ws, hws, vws)
+      case head :: next ⇒
+        val w = tryPutCrossing(head, table, hws, vws) getOrElse
+          wordState(head.word, table, hws, vws)
 
-				val (hw, vw) = putWord(w, table, hws, vws)
-				impl(next, w :: ws, hw, vw)
+        val (hw, vw) = putWord(w, table, hws, vws)
+        impl(next, w :: ws, hw, vw)
 
-	impl()
+  impl()
 
 /**
  * Reorders the word states based on their
@@ -120,16 +120,16 @@ private def mergedOrNew(
  */
 
 private def reorderedWordStates(
-	canonicalOrder: List[WordState],
-	wordStatesMap:  Map[String, WordState]
+  canonicalOrder: List[WordState],
+  wordStatesMap:  Map[String, WordState]
 ): List[WordState] =
-	canonicalOrder map (_.word) map wordStatesMap
+  canonicalOrder map (_.word) map wordStatesMap
 
 extension (random: Random)
-	/**
-	 * Generates mutation rate value
-	 * @return value in range [0 until 1]
-	 */
+  /**
+   * Generates mutation rate value
+   * @return value in range [0 until 1]
+   */
 
-	def nextMutationRate: Float =
-		random.between(0F, 1F)
+  def nextMutationRate: Float =
+    random.between(0F, 1F)

@@ -23,21 +23,21 @@ given generator: Random = Random
  */
 
 def generation(words: List[String], tableSize: Int): TableState =
-	@tailrec
-	def impl(): TableState =
-		val population = initialPopulation(words, tableSize)
-		val selected = selectWithRoulette(population)
-		val next = nextPopulation(selected)
-		val (max, index) = maxFitness(next)
+  @tailrec
+  def impl(): TableState =
+    val population = initialPopulation(words, tableSize)
+    val selected = selectWithRoulette(population)
+    val next = nextPopulation(selected)
+    val (max, index) = maxFitness(next)
 
-		if max >= MaxFitness then
-			val TableState(table, ws) = next(index)
-			val ordWs = reorderWordStates(words, ws)
-			return TableState(table, ordWs)
+    if max >= MaxFitness then
+      val TableState(table, ws) = next(index)
+      val ordWs = reorderWordStates(words, ws)
+      return TableState(table, ordWs)
 
-		impl()
+    impl()
 
-	impl()
+  impl()
 
 /**
  * Reorders the word states based on their
@@ -49,8 +49,8 @@ def generation(words: List[String], tableSize: Int): TableState =
  */
 
 private def reorderWordStates(
-	canonicalOrder: List[String],
-	wordStates:     List[WordState]
+  canonicalOrder: List[String],
+  wordStates:     List[WordState]
 ): List[WordState] =
-	val wordMap = wordStatesMap(wordStates)
-	canonicalOrder map wordMap
+  val wordMap = wordStatesMap(wordStates)
+  canonicalOrder map wordMap

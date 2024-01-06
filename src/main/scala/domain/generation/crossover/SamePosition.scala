@@ -15,10 +15,10 @@ import domain.generation.selection.canPutWord
  */
 
 private def tryPutWithSamePosition(
-	wordState:       WordState,
-	table:           Table,
-	horizontalWords: List[WordState],
-	verticalWords:   List[WordState]
+  wordState:       WordState,
+  table:           Table,
+  horizontalWords: List[WordState],
+  verticalWords:   List[WordState]
 ): Option[WordState] =
-	val canPut = canPutWord(wordState, table, horizontalWords, verticalWords)
-	if canPut then Option(wordState) else Option.empty
+  val canPut = canPutWord(wordState, table, horizontalWords, verticalWords)
+  if canPut then Option(wordState) else Option.empty

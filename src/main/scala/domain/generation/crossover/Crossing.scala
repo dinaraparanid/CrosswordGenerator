@@ -15,16 +15,16 @@ import domain.generation.selection.{canPutWordHorizontal, canPutWordVertical}
  */
 
 def tryPutCrossing(
-	wordState:       WordState,
-	table:           Table,
-	horizontalWords: List[WordState],
-	verticalWords:   List[WordState]
+  wordState:       WordState,
+  table:           Table,
+  horizontalWords: List[WordState],
+  verticalWords:   List[WordState]
 ): Option[WordState] =
-	val word = wordState.word
-	tryCrossingStartCoords(word, table, horizontalWords, verticalWords)
-		.map { case CoordsWithLayout(row, column, layout) ⇒
-			WordState(word, row, column, layout)
-		}
+  val word = wordState.word
+  tryCrossingStartCoords(word, table, horizontalWords, verticalWords)
+    .map { case CoordsWithLayout(row, column, layout) ⇒
+      WordState(word, row, column, layout)
+    }
 
 /**
  * Attempts to find starting coordinates for a word on the table,
@@ -39,17 +39,17 @@ def tryPutCrossing(
  */
 
 private def tryCrossingStartCoords(
-	word:            String,
-	table:           Table,
-	horizontalWords: List[WordState],
-	verticalWords:   List[WordState]
+  word:            String,
+  table:           Table,
+  horizontalWords: List[WordState],
+  verticalWords:   List[WordState]
 ): Option[CoordsWithLayout] =
-	List(
-		tryCrossingStartCoordsHorizontal(word, table, horizontalWords, verticalWords),
-		tryCrossingStartCoordsVertical(word, table, horizontalWords, verticalWords)
-	)
-		.flatten
-		.headOption
+  List(
+    tryCrossingStartCoordsHorizontal(word, table, horizontalWords, verticalWords),
+    tryCrossingStartCoordsVertical(word, table, horizontalWords, verticalWords)
+  )
+    .flatten
+    .headOption
 
 /**
  * Attempts to find starting coordinates for a word on the table,
@@ -65,18 +65,18 @@ private def tryCrossingStartCoords(
  */
 
 private def tryCrossingStartCoordsHorizontal(
-	word:            String,
-	table:           Table,
-	horizontalWords: List[WordState],
-	verticalWords:   List[WordState]
+  word:            String,
+  table:           Table,
+  horizontalWords: List[WordState],
+  verticalWords:   List[WordState]
 ): Option[CoordsWithLayout] =
-	@inline
-	def tryPutWord(row: Int, column: Int): Boolean =
-		canPutWordHorizontal(word, row, column, table, horizontalWords)
+  @inline
+  def tryPutWord(row: Int, column: Int): Boolean =
+    canPutWordHorizontal(word, row, column, table, horizontalWords)
 
-	possibleConnections(word, verticalWords)
-		.flatMap(possibleStartCoordsHorizontal(word, _))
-		.find { case CoordsWithLayout(row, column, _) ⇒ tryPutWord(row, column) }
+  possibleConnections(word, verticalWords)
+    .flatMap(possibleStartCoordsHorizontal(word, _))
+    .find { case CoordsWithLayout(row, column, _) ⇒ tryPutWord(row, column) }
 
 /**
  * Attempts to find starting coordinates for a word on the table,
@@ -92,18 +92,18 @@ private def tryCrossingStartCoordsHorizontal(
  */
 
 private def tryCrossingStartCoordsVertical(
-	word:            String,
-	table:           Table,
-	horizontalWords: List[WordState],
-	verticalWords:   List[WordState]
+  word:            String,
+  table:           Table,
+  horizontalWords: List[WordState],
+  verticalWords:   List[WordState]
 ): Option[CoordsWithLayout] = {
-	@inline
-	def tryPutWord(row: Int, column: Int): Boolean =
-		canPutWordVertical(word, row, column, table, verticalWords)
+  @inline
+  def tryPutWord(row: Int, column: Int): Boolean =
+    canPutWordVertical(word, row, column, table, verticalWords)
 
-	possibleConnections(word, horizontalWords)
-		.flatMap(possibleStartCoordsVertical(word, _))
-		.find { case CoordsWithLayout(row, column, _) ⇒ tryPutWord(row, column) }
+  possibleConnections(word, horizontalWords)
+    .flatMap(possibleStartCoordsVertical(word, _))
+    .find { case CoordsWithLayout(row, column, _) ⇒ tryPutWord(row, column) }
 }
 
 /**
@@ -119,14 +119,14 @@ private def tryCrossingStartCoordsVertical(
  */
 
 private def possibleStartCoordsHorizontal(
-	word:       String,
-	connection: Coords
+  word:       String,
+  connection: Coords
 ): Option[CoordsWithLayout] =
-	val Coords(row, column, letter) = connection
-	val index = word indexOf letter
+  val Coords(row, column, letter) = connection
+  val index = word indexOf letter
 
-	if column < index then Option.empty
-	else Option(CoordsWithLayout(row, column - index, Layout.HORIZONTAL))
+  if column < index then Option.empty
+  else Option(CoordsWithLayout(row, column - index, Layout.HORIZONTAL))
 
 /**
  * Calculates the starting coordinates
@@ -141,11 +141,11 @@ private def possibleStartCoordsHorizontal(
  */
 
 private def possibleStartCoordsVertical(
-	word:       String,
-	connection: Coords
+  word:       String,
+  connection: Coords
 ): Option[CoordsWithLayout] =
-	val Coords(row, column, letter) = connection
-	val index = word indexOf letter
+  val Coords(row, column, letter) = connection
+  val index = word indexOf letter
 
-	if row < index then Option.empty
-	else Option(CoordsWithLayout(row - index, column, Layout.VERTICAL))
+  if row < index then Option.empty
+  else Option(CoordsWithLayout(row - index, column, Layout.VERTICAL))

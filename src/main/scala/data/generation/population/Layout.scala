@@ -5,9 +5,9 @@ import scala.util.Random
 /** Word' placement position in the table */
 
 enum Layout:
-	case HORIZONTAL, VERTICAL
+  case HORIZONTAL, VERTICAL
 
 extension (random: Random)
-	/** Generates one of two possible layouts */
-	def nextLayout: Layout =
-		Layout values (random nextInt 2)
+  /** Generates one of two possible layouts */
+  def nextLayout: Layout =
+    Layout values (random nextInt 2)
