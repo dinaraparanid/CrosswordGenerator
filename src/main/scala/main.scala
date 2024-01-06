@@ -1,21 +1,26 @@
 import presentation.MainFrame
 import data.generation.population.TableState.showTable
-import domain.generation.population.initialPopulation
 import cats.implicits.*
 import domain.generation.generation
 
 @main
 def main(): Unit =
 	val words = List(
-		"cemetery",
-		"widow",
-		"chemistry",
-		"engine",
-		"gate",
-		"wine",
-		"fairytale",
-		"pillow",
-		"train"
+		"akin",
+		"reduce",
+		"user",
+		"collar",
+		"city",
+		"issued",
+		"easily",
+		"exam",
+		"travel",
+		"arch",
+		"pencil",
+		"tabs",
+		"keeps",
+		"omits",
+		"neutral",
 	)
 
 	println(generation(words, 20).show)

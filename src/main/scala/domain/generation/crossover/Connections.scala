@@ -2,8 +2,6 @@ package domain.generation.crossover
 
 import data.generation.population.{Coords, Layout, WordState}
 
-import scala.collection.mutable
-
 type LetterMap = Map[Char, Seq[Coords]]
 
 /**

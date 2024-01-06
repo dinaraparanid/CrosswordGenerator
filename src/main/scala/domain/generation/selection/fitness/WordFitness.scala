@@ -96,7 +96,7 @@ private def crossed(
 	wordState:    WordState,
 	wordsCrosses: WordsCrosses
 ): Float =
-	if wordsCrosses contains wordState then 0F
+	if !(wordsCrosses contains wordState) then 0F
 	else if wordsCrosses(wordState).isEmpty then 0F
 	else MaxFitnessCriteriaWeight
 

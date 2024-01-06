@@ -9,8 +9,6 @@ import domain.generation.selection.fitness.maxFitness
 import scala.annotation.tailrec
 import scala.util.Random
 
-import cats.implicits._
-
 /** graph connectivity + (words crossing + not following) */
 
 private val MaxFitness = 2F

@@ -37,7 +37,7 @@ def mutation(tableState: TableState) =
 	val (mergedNew, _, _) = mergedOrNew(mutated, newTable, hw, vw)
 	wordMap ++= wordStatesMap(mergedNew)
 
-	TableState(table, reorderedWordStates(words, wordMap))
+	TableState(newTable, reorderedWordStates(words, wordMap))
 
 /**
  * Choose connectivity components whose words
@@ -57,7 +57,7 @@ private def mutationSelection(
 		comps:      List[Set[WordState]] = components,
 		mutated:    List[WordState] = Nil,
 		notMutated: List[WordState] = Nil
-	): (List[WordState], List[WordState]) = {
+	): (List[WordState], List[WordState]) =
 		comps match
 			case Nil ⇒ (mutated, notMutated)
 
@@ -67,7 +67,6 @@ private def mutationSelection(
 
 			case head :: next ⇒
 				impl(next, mutated, notMutated ++ head)
-	}
 
 	val (mutatedWords, notMutatedWords) = impl()
 	MutationSelection(mutatedWords, notMutatedWords)
@@ -103,8 +102,8 @@ private def mergedOrNew(
 		words match
 			case Nil ⇒ (ws, hws, vws)
 			case head :: next ⇒
-				val w = tryPutCrossing(head, table, horizontalWords, verticalWords) getOrElse
-					wordState(head.word, table, horizontalWords, verticalWords)
+				val w = tryPutCrossing(head, table, hws, vws) getOrElse
+					wordState(head.word, table, hws, vws)
 
 				val (hw, vw) = putWord(w, table, hws, vws)
 				impl(next, w :: ws, hw, vw)
