@@ -7,9 +7,9 @@ import zio.ZIO
 import java.awt.{GridBagConstraints, GridBagLayout}
 import javax.swing.{JButton, JPanel}
 
-def MainMenu(): ZIO[AppConfig, Nothing, JPanel] = {
+def MainMenu(): ZIO[AppConfig, Nothing, JPanel] =
   def impl(generateButton: JButton, theme: Theme): JPanel =
-    new JPanel {
+    new JPanel:
       setLayout(GridBagLayout())
 
       val gbc: GridBagConstraints = GridBagConstraints()
@@ -17,10 +17,8 @@ def MainMenu(): ZIO[AppConfig, Nothing, JPanel] = {
 
       add(generateButton, gbc)
       setBackground(theme.backgroundColor)
-    }
 
   for {
     theme ← appTheme()
     generateButton ← GenerateButton()
   } yield impl(generateButton, theme)
-}
