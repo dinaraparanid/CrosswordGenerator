@@ -11,28 +11,28 @@ sealed trait Theme:
   def fontColor: Color
 
 private case object LightTheme extends Theme:
-  override def primaryColor: Color = royalPurple
+  override def primaryColor: Color = grape
 
-  override def secondaryColor: Color = mauve
+  override def secondaryColor: Color = russianViolet
 
-  override def secondaryAlternativeColor: Color = richBlack
+  override def secondaryAlternativeColor: Color = columbiaBlue
 
-  override def backgroundColor: Color = pinkIavender
+  override def backgroundColor: Color = wisteria
 
-  override def backgroundAlternativeColor: Color = russianViolet
+  override def backgroundAlternativeColor: Color = amethyst
 
-  override def fontColor: Color = Color.BLACK
+  override def fontColor: Color = Color.WHITE
 
 private case object DarkTheme extends Theme:
   override def primaryColor: Color = royalPurple
 
-  override def secondaryColor: Color = richBlack
+  override def secondaryColor: Color = pinkIavender
 
-  override def secondaryAlternativeColor: Color = mauve
+  override def secondaryAlternativeColor: Color = richBlack
 
   override def backgroundColor: Color = russianViolet
 
-  override def backgroundAlternativeColor: Color = pinkIavender
+  override def backgroundAlternativeColor: Color = mauve
 
   override def fontColor: Color = Color.WHITE
 
@@ -43,6 +43,13 @@ def theme(themes: Themes): Theme =
   themes match
     case Themes.Light ⇒ LightTheme
     case Themes.Dark ⇒ DarkTheme
+
+private def grape: Color = Color(111, 45, 189)
+private def amethyst: Color = Color(166, 99, 204)
+private def wisteria: Color = Color(178, 152, 220)
+private def columbiaBlue: Color = Color(184, 208, 235)
+private def celeste: Color = Color(185, 250, 248)
+
 
 private def royalPurple: Color = Color(115, 83, 186)
 
