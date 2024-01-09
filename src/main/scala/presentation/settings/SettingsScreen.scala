@@ -1,20 +1,23 @@
 package presentation.settings
 
 import data.app.AppConfig
-import presentation.appTheme
+import presentation.appThemeStream
 import presentation.ui.Theme
-import zio.ZIO
+
+import zio.{URIO, ZIO}
 
 import java.awt.GridBagLayout
 import javax.swing.{JLabel, JPanel}
 
-def SettingsScreen(): ZIO[AppConfig, Nothing, JPanel] =
-  def impl(theme: Theme): JPanel =
-    new JPanel:
-      setBackground(theme.backgroundColor)
-      setLayout(GridBagLayout())
-      add(JLabel("Settings Screen"))
+def SettingsScreen(): URIO[AppConfig, JPanel] =
+  val panel = new JPanel:
+    setLayout(GridBagLayout())
+    add(JLabel("Settings Screen"))
+
+  def recompose(theme: Theme): Unit =
+    panel setBackground theme.backgroundColor
 
   for {
-    theme ← appTheme()
-  } yield impl(theme)
+    themes ← appThemeStream()
+    _      ← themes.foreach(ZIO attempt recompose(_)).fork
+  } yield panel

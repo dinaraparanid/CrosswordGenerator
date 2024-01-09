@@ -22,22 +22,23 @@ class RippleEffect(private val component: Component):
 
   var rippleColor: Color = component.getBackground
 
-  private val effects = mutable.ArrayDeque[RippleEffectImpl]()
+  private val effects = mutable.HashMap[Long, RippleEffectImpl]()
 
   private def addEffect(location: Point): Unit =
-    effects += RippleEffectImpl(component, location, rippleColor, effects)
+    val effect = RippleEffectImpl(component, location, rippleColor, effects)
+    effects(effect.id) = effect
 
   def render(g: Graphics, contain: Shape): Unit =
     val g2 = g.create.asInstanceOf[Graphics2D]
     g2.setQualityRenderingHints()
-    effects foreach { _.render(g2, contain) }
+    effects foreach { case (_, effect) ⇒ effect.render(g2, contain) }
 
 private class RippleEffectImpl(
   private val component: Component,
   private val location: Point,
   private val rippleColor: Color,
-  private val effects: mutable.ArrayDeque[RippleEffectImpl],
-  private val id: Long = System.currentTimeMillis(),
+  private val effects: mutable.HashMap[Long, RippleEffectImpl],
+  val id: Long = System.currentTimeMillis(),
 ):
   private var animFraction = 0F
   private val animator = Animator(500, timingAdapter)
@@ -67,7 +68,7 @@ private class RippleEffectImpl(
         component.repaint()
 
       override def end(): Unit =
-        effects removeFirst { _.id == id }
+        effects -= id
 
   private def getShape(size: Double): Ellipse2D.Double =
     val s = size * animFraction

@@ -2,56 +2,57 @@ package presentation.main
 
 import data.app.AppConfig
 import data.app.navigation.NavigationService
-import presentation.appTheme
+import presentation.appThemeStream
 import presentation.ui.Theme
-import zio.ZIO
+import presentation.ui.utils.combine
+
+import zio.{RIO, ZIO}
 
 import java.awt.{Component, Dimension, GridBagLayout}
 import javax.swing.*
 
-def MainScreen(): ZIO[AppConfig & NavigationService, Nothing, JPanel] =
-  def impl(
-    theme: Theme,
-    appTitle: JLabel,
-    generateButton: JButton,
-    settingsButton: JButton,
-  ): JPanel =
-    new JPanel:
-      setBackground(theme.backgroundColor)
-      setLayout(GridBagLayout())
-      add(content(theme, appTitle, generateButton, settingsButton))
+def MainScreen(): RIO[AppConfig & NavigationService, JPanel] =
+  val subPanel = new JPanel:
+    setLayout(BoxLayout(this, BoxLayout.Y_AXIS))
 
-  def content(
-    theme:          Theme,
+  val mainPanel = new JPanel:
+    setLayout(GridBagLayout())
+    add(subPanel)
+
+  def recomposeMainPanel(theme: Theme): Unit =
+    mainPanel setBackground theme.backgroundColor
+
+  def setContentOfSubPanel(
     appTitle:       JLabel,
     generateButton: JButton,
     settingsButton: JButton,
-  ): JPanel =
-    new JPanel:
-      setBackground(theme.backgroundColor)
-      setLayout(BoxLayout(this, BoxLayout.Y_AXIS))
+  ): Unit =
+    appTitle setAlignmentX Component.CENTER_ALIGNMENT
+    subPanel add appTitle
 
-      appTitle setAlignmentX Component.CENTER_ALIGNMENT
-      add(appTitle)
+    subPanel add Box.createRigidArea(Dimension(0, 75))
 
-      add(Box.createRigidArea(Dimension(0, 75)))
+    generateButton setAlignmentX Component.CENTER_ALIGNMENT
+    subPanel add generateButton
 
-      generateButton setAlignmentX Component.CENTER_ALIGNMENT
-      add(generateButton)
+    subPanel add Box.createRigidArea(Dimension(0, 30))
 
-      add(Box.createRigidArea(Dimension(0, 30)))
+    settingsButton setAlignmentX Component.CENTER_ALIGNMENT
+    subPanel add settingsButton
 
-      settingsButton setAlignmentX Component.CENTER_ALIGNMENT
-      add(settingsButton)
+  def recomposeSubPanel(theme: Theme): Unit =
+    subPanel setBackground theme.backgroundColor
 
   for {
-    theme ← appTheme()
-    appTitle ← AppTitle()
-    generateButton ← GenerateButton()
-    settingsButton ← SettingsButton()
-  } yield impl(
-    theme = theme,
-    appTitle = appTitle,
-    generateButton = generateButton,
-    settingsButton = settingsButton
-  )
+    themes          ← appThemeStream()
+    appTitles       ← AppTitle()
+    generateButtons ← GenerateButton()
+    settingsButtons ← SettingsButton()
+
+    _ ← ZIO attempt setContentOfSubPanel(appTitles, generateButtons, settingsButtons)
+    _ ← themes.foreach { theme ⇒
+      ZIO attempt:
+        recomposeSubPanel(theme)
+        recomposeMainPanel(theme)
+    }.fork
+  } yield mainPanel

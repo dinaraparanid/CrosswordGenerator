@@ -3,39 +3,50 @@ package presentation
 import data.app.AppConfig
 import data.app.navigation.{NavigationService, Navigator}
 import presentation.ui.Theme
-import zio.ZIO
 
-def appConfig(): ZIO[AppConfig, Nothing, AppConfig] =
-  for {
-    env ← ZIO.environment[AppConfig]
-    config = env.get[AppConfig]
-  } yield config
+import zio.{ZIO, URIO}
+import zio.stream.{SubscriptionRef, UStream}
 
-def appTheme(): ZIO[AppConfig, Nothing, Theme] =
+def appConfig(): URIO[AppConfig, AppConfig] =
+  for (env ← ZIO.environment[AppConfig])
+    yield env.get[AppConfig]
+
+def appThemeRef(): URIO[AppConfig, SubscriptionRef[Theme]] =
+  for (config ← appConfig())
+    yield config.theme
+
+def appThemeStream(): URIO[AppConfig, UStream[Theme]] =
+  for (ref ← appThemeRef())
+    yield ref.changes
+
+def appTheme(): URIO[AppConfig, Theme] =
   for {
-    config ← appConfig()
-    theme = config.theme
+    ref   ← appThemeRef()
+    theme ← ref.get
   } yield theme
 
-def appFont(): ZIO[AppConfig, Nothing, String] =
-  for {
-    config ← appConfig()
-    font = config.font
-  } yield font
+def appFontRef(): URIO[AppConfig, SubscriptionRef[String]] =
+  for (config ← appConfig())
+    yield config.font
 
-def navigationService(): ZIO[NavigationService, Nothing, NavigationService] =
+def appFontStream(): URIO[AppConfig, UStream[String]] =
+  for (ref ← appFontRef())
+    yield ref.changes
+
+def navigationService(): URIO[NavigationService, NavigationService] =
+  for (nav ← ZIO.service[NavigationService])
+    yield nav
+
+def navigatorRef(): URIO[NavigationService, SubscriptionRef[Option[Navigator]]] =
+  for (service ← navigationService())
+    yield service.nav
+
+def navigatorStream(): URIO[NavigationService, UStream[Option[Navigator]]] =
+  for (ref ← navigatorRef())
+    yield ref.changes
+
+def navigator(): URIO[NavigationService, Option[Navigator]] =
   for {
-    nav ← ZIO.service[NavigationService]
+    ref ← navigatorRef()
+    nav ← ref.get
   } yield nav
-
-def navigatorOption(): ZIO[NavigationService, Nothing, Option[Navigator]] =
-  for {
-    service ← navigationService()
-    ref = service.nav
-    navigator ← ref.get
-  } yield navigator
-
-def navigator(): ZIO[NavigationService, Nothing, Navigator] =
-  for {
-    nav ← navigatorOption()
-  } yield nav.get

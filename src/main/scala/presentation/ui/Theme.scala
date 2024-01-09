@@ -1,5 +1,7 @@
 package presentation.ui
 
+import presentation.ui.Themes.{Dark, Light}
+
 import java.awt.Color
 
 sealed trait Theme:
@@ -9,6 +11,7 @@ sealed trait Theme:
   def backgroundColor: Color
   def backgroundAlternativeColor: Color
   def fontColor: Color
+  def enumValue: Themes
 
 private case object LightTheme extends Theme:
   override def primaryColor: Color = grape
@@ -21,7 +24,9 @@ private case object LightTheme extends Theme:
 
   override def backgroundAlternativeColor: Color = amethyst
 
-  override def fontColor: Color = Color.WHITE
+  override def fontColor: Color = Color.BLACK
+
+  override def enumValue: Themes = Light
 
 private case object DarkTheme extends Theme:
   override def primaryColor: Color = royalPurple
@@ -35,6 +40,8 @@ private case object DarkTheme extends Theme:
   override def backgroundAlternativeColor: Color = mauve
 
   override def fontColor: Color = Color.WHITE
+
+  override def enumValue: Themes = Dark
 
 enum Themes:
   case Light, Dark

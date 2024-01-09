@@ -1,17 +1,31 @@
 package data.app
 
 import presentation.ui.{Theme, Themes, theme}
-import zio.ZLayer
+
+import zio.{UIO, ZLayer, ULayer}
+import zio.stream.SubscriptionRef
 
 import java.awt.Font
 
-case class AppConfig(theme: Theme, font: String)
+case class AppConfig(
+  theme: SubscriptionRef[Theme],
+  font: SubscriptionRef[String]
+):
+  def resetTheme(): UIO[Unit] =
+    for {
+      t ← theme.get
+      _ <- theme set oppositeTheme(t.enumValue)
+    } yield ()
 
 object AppConfig:
-  val layer: zio.ULayer[AppConfig] =
-    val config = AppConfig(
-      theme = theme(Themes.Light),
-      font = Font.SERIF
-    )
+  val layer: ULayer[AppConfig] =
+    ZLayer:
+      for {
+        thm ← SubscriptionRef make theme(Themes.Light)
+        font ← SubscriptionRef make Font.SERIF
+      } yield AppConfig(thm, font)
 
-    ZLayer.succeed(config)
+private def oppositeTheme(t: Themes) =
+  t match
+    case Themes.Light ⇒ theme(Themes.Dark)
+    case Themes.Dark  ⇒ theme(Themes.Light)
