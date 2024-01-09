@@ -1,21 +1,19 @@
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatNightOwlIJTheme
-
-import data.app.AppConfig
+import data.app.{AppConfig, InputStates}
 import data.app.navigation.NavigationService
 import presentation.ui.Theme
 import presentation.{MainFrame, appThemeStream}
-
 import zio.{Promise, RIO, UIO, ULayer, ZIO, ZIOAppDefault}
 
-import java.awt.{Font, GraphicsEnvironment}
+import java.awt.{Color, Font, GraphicsEnvironment}
 import java.io.File
 import javax.swing.{JFrame, UIDefaults, UIManager}
 
 object Application extends ZIOAppDefault:
-  private val appLayer: ULayer[AppConfig & NavigationService] =
-    AppConfig.layer ++ NavigationService.layer
+  private val appLayer: ULayer[AppConfig & NavigationService & InputStates] =
+    AppConfig.layer ++ NavigationService.layer ++ InputStates.layer
 
-  private val appLogic: RIO[AppConfig & NavigationService, Unit] =
+  private val appLogic: RIO[AppConfig & NavigationService & InputStates, Unit] =
     setup()
 
     for {
@@ -37,7 +35,7 @@ object Application extends ZIOAppDefault:
   override def run: RIO[Any, Unit] =
     appLogic provideLayer appLayer
 
-  private def runApplication(): RIO[AppConfig & NavigationService, JFrame] =
+  private def runApplication(): RIO[AppConfig & NavigationService & InputStates, JFrame] =
     for {
       frame ← MainFrame()
       _     ← ZIO attempt (frame setVisible true)
@@ -61,6 +59,8 @@ private def setupColors(theme: Theme): Unit =
   uiConfig.put("MenuItem.selectionForeground", theme.fontColor)
   uiConfig.put("MenuBar.selectionBackground", theme.backgroundColor)
   uiConfig.put("MenuBar.selectionForeground", theme.fontColor)
+  uiConfig.put("Component.borderColor", theme.primaryColor.darker())
+  uiConfig.put("Component.focusedBorderColor", theme.primaryColor)
 
 private def uiConfig: UIDefaults =
   UIManager.getLookAndFeelDefaults

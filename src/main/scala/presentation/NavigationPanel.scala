@@ -1,6 +1,6 @@
 package presentation
 
-import data.app.AppConfig
+import data.app.{AppConfig, InputStates}
 import data.app.navigation.{NavigationService, Navigator}
 import presentation.generation.GenerationScreen
 import presentation.main.MainScreen
@@ -12,7 +12,7 @@ import zio.{RIO, ZIO}
 import java.awt.CardLayout
 import javax.swing.JPanel
 
-def NavigationPanel(): RIO[AppConfig & NavigationService, (CardLayout, JPanel)] =
+def NavigationPanel(): RIO[AppConfig & NavigationService & InputStates, (CardLayout, JPanel)] =
   val card = CardLayout()
   val panel = JPanel(card)
 

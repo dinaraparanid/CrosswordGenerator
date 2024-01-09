@@ -10,20 +10,22 @@ import java.awt.Font
 case class AppConfig(
   theme: SubscriptionRef[Theme],
   font: SubscriptionRef[String]
-):
-  def resetTheme(): UIO[Unit] =
-    for {
-      t ← theme.get
-      _ <- theme set oppositeTheme(t.enumValue)
-    } yield ()
+)
 
 object AppConfig:
   val layer: ULayer[AppConfig] =
     ZLayer:
       for {
-        thm ← SubscriptionRef make theme(Themes.Light)
+        thm  ← SubscriptionRef make theme(Themes.Light)
         font ← SubscriptionRef make Font.SERIF
       } yield AppConfig(thm, font)
+
+extension (config: AppConfig)
+  def resetTheme(): UIO[Unit] =
+    for {
+      t ← config.theme.get
+      _ ← config.theme set oppositeTheme(t.enumValue)
+    } yield ()
 
 private def oppositeTheme(t: Themes) =
   t match

@@ -4,7 +4,6 @@ import data.app.AppConfig
 import data.app.navigation.NavigationService
 import presentation.appThemeStream
 import presentation.ui.Theme
-import presentation.ui.utils.combine
 
 import zio.{RIO, ZIO}
 

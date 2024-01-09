@@ -1,14 +1,14 @@
 package data.app.navigation
 
 import zio.stream.SubscriptionRef
-import zio.{ULayer, ZLayer, UIO}
+import zio.{UIO, ULayer, ZLayer}
 
 import java.awt.CardLayout
-import javax.swing.JPanel
+import javax.swing.{JFrame, JPanel}
 
 final class NavigationService(val nav: SubscriptionRef[Option[Navigator]]):
-  def invalidate(panel: JPanel, card: CardLayout): UIO[Unit] =
-    nav set Option(Navigator(panel, card))
+  def invalidate(panel: JPanel, card: CardLayout, frame: JFrame): UIO[Unit] =
+    nav set Option(Navigator(panel, card, frame))
 
 object NavigationService:
   val layer: ULayer[NavigationService] = ZLayer {

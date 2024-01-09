@@ -1,6 +1,6 @@
 package presentation.main.menu
 
-import data.app.AppConfig
+import data.app.{AppConfig, resetTheme}
 import presentation.{appConfig, appThemeStream}
 import presentation.ui.Theme
 

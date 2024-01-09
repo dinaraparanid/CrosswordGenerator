@@ -1,10 +1,10 @@
 package presentation
 
-import data.app.AppConfig
+import data.app.{AppConfig, InputStates}
 import data.app.navigation.{NavigationService, Navigator}
 import presentation.ui.Theme
 
-import zio.{ZIO, URIO}
+import zio.{URIO, ZIO}
 import zio.stream.{SubscriptionRef, UStream}
 
 def appConfig(): URIO[AppConfig, AppConfig] =
@@ -18,12 +18,6 @@ def appThemeRef(): URIO[AppConfig, SubscriptionRef[Theme]] =
 def appThemeStream(): URIO[AppConfig, UStream[Theme]] =
   for (ref ← appThemeRef())
     yield ref.changes
-
-def appTheme(): URIO[AppConfig, Theme] =
-  for {
-    ref   ← appThemeRef()
-    theme ← ref.get
-  } yield theme
 
 def appFontRef(): URIO[AppConfig, SubscriptionRef[String]] =
   for (config ← appConfig())
@@ -50,3 +44,23 @@ def navigator(): URIO[NavigationService, Option[Navigator]] =
     ref ← navigatorRef()
     nav ← ref.get
   } yield nav
+
+def inputStates(): URIO[InputStates, InputStates] =
+  for (inp ← ZIO.service[InputStates])
+    yield inp
+
+def titleInputRef(): URIO[InputStates, SubscriptionRef[String]] =
+  for (inp ← inputStates())
+    yield inp.titleInput
+
+def titleInputStream(): URIO[InputStates, UStream[String]] =
+  for (ref ← titleInputRef())
+    yield ref.changes
+
+def wordsInputRef(): URIO[InputStates, SubscriptionRef[String]] =
+  for (inp ← inputStates())
+    yield inp.wordsInput
+
+def wordsInputStream(): URIO[InputStates, UStream[String]] =
+  for (ref ← wordsInputRef())
+    yield ref.changes
