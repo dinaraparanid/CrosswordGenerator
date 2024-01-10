@@ -1,7 +1,12 @@
 package data.app
 
-import zio.{ZLayer, ULayer, UIO}
-import zio.stream.SubscriptionRef
+import zio.{UIO, ULayer, ZLayer}
+import zio.stream.{SubscriptionRef, UStream}
+
+import scala.util.matching.Regex
+
+private val CrosswordCorrectInputRegex: Regex =
+  "\\s*((.*) - (.*)\\s*)+".r
 
 case class InputStates(
   titleInput: SubscriptionRef[String],
@@ -22,3 +27,7 @@ extension (states: InputStates)
 
   def resetWords(words: String): UIO[Unit] =
     states.wordsInput set words
+
+  def isInputCorrectStream: UStream[Boolean] =
+    states.wordsInput.changes map
+      CrosswordCorrectInputRegex.matches

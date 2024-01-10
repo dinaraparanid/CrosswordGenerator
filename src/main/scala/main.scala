@@ -1,13 +1,14 @@
-import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatNightOwlIJTheme
-import data.app.{AppConfig, InputStates}
+import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMaterialPalenightIJTheme
+
 import data.app.navigation.NavigationService
-import presentation.ui.Theme
-import presentation.{MainFrame, appThemeStream}
+import data.app.{AppConfig, InputStates}
+import presentation.MainFrame
+
 import zio.{Promise, RIO, UIO, ULayer, ZIO, ZIOAppDefault}
 
-import java.awt.{Color, Font, GraphicsEnvironment}
+import java.awt.{Font, GraphicsEnvironment}
 import java.io.File
-import javax.swing.{JFrame, UIDefaults, UIManager}
+import javax.swing.JFrame
 
 object Application extends ZIOAppDefault:
   private val appLayer: ULayer[AppConfig & NavigationService & InputStates] =
@@ -17,18 +18,7 @@ object Application extends ZIOAppDefault:
     setup()
 
     for {
-      themes ← appThemeStream()
-
-      _ ← themes
-        .mapZIO { theme ⇒
-          setupColors(theme)
-          runApplication()
-        }
-        .sliding(2)
-        .foreach { frames ⇒
-          ZIO attempt (frames.head setVisible false)
-        }
-
+      _ ← runApplication()
       _ ← waitUntilClosed()
     } yield ()
 
@@ -48,19 +38,14 @@ object Application extends ZIOAppDefault:
     } yield ()
 
 private def setup(): Unit =
-  FlatNightOwlIJTheme.setup()
+  FlatMaterialPalenightIJTheme.setup()
   val ge = GraphicsEnvironment.getLocalGraphicsEnvironment
-  ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, File("./res/pristina.ttf")))
+  ge registerFont "./res/pristina.ttf"
 
-private def setupColors(theme: Theme): Unit =
-  uiConfig.put("MenuItem.acceleratorForeground", theme.secondaryColor)
-  uiConfig.put("MenuItem.acceleratorSelectionForeground", theme.secondaryColor)
-  uiConfig.put("MenuItem.selectionBackground", theme.backgroundColor)
-  uiConfig.put("MenuItem.selectionForeground", theme.fontColor)
-  uiConfig.put("MenuBar.selectionBackground", theme.backgroundColor)
-  uiConfig.put("MenuBar.selectionForeground", theme.fontColor)
-  uiConfig.put("Component.borderColor", theme.primaryColor.darker())
-  uiConfig.put("Component.focusedBorderColor", theme.primaryColor)
-
-private def uiConfig: UIDefaults =
-  UIManager.getLookAndFeelDefaults
+extension (ge: GraphicsEnvironment)
+  private def registerFont(path: String) =
+    ge registerFont
+      Font.createFont(
+        Font.TRUETYPE_FONT,
+        File(path)
+      )

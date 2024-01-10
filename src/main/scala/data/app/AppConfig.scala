@@ -1,33 +1,31 @@
 package data.app
 
-import presentation.ui.{Theme, Themes, theme}
+import com.formdev.flatlaf.intellijthemes.materialthemeuilite.*
 
-import zio.{UIO, ZLayer, ULayer}
 import zio.stream.SubscriptionRef
+import zio.{ULayer, ZLayer}
 
 import java.awt.Font
+import javax.swing.{JFrame, SwingUtilities}
 
 case class AppConfig(
-  theme: SubscriptionRef[Theme],
+  private var theme: String,
   font: SubscriptionRef[String]
-)
+):
+  def resetTheme(frame: JFrame): Unit =
+    theme = theme match
+      case FlatMaterialPalenightIJTheme.NAME ⇒
+        FlatNightOwlIJTheme.setup()
+        FlatNightOwlIJTheme.NAME
+
+      case FlatNightOwlIJTheme.NAME ⇒
+        FlatMaterialPalenightIJTheme.setup()
+        FlatMaterialPalenightIJTheme.NAME
+
+    SwingUtilities.updateComponentTreeUI(frame)
 
 object AppConfig:
   val layer: ULayer[AppConfig] =
     ZLayer:
-      for {
-        thm  ← SubscriptionRef make theme(Themes.Light)
-        font ← SubscriptionRef make Font.SERIF
-      } yield AppConfig(thm, font)
-
-extension (config: AppConfig)
-  def resetTheme(): UIO[Unit] =
-    for {
-      t ← config.theme.get
-      _ ← config.theme set oppositeTheme(t.enumValue)
-    } yield ()
-
-private def oppositeTheme(t: Themes) =
-  t match
-    case Themes.Light ⇒ theme(Themes.Dark)
-    case Themes.Dark  ⇒ theme(Themes.Light)
+      for font ← SubscriptionRef make Font.SERIF
+        yield AppConfig(FlatMaterialPalenightIJTheme.NAME, font)

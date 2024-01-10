@@ -23,7 +23,7 @@ val EmptyLetter = '_'
  */
 
 def initialPopulation(words: List[String], tableSize: Int): Seq[TableState] =
-  LazyList continually { wordTable(words, tableSize) } take PopulationSize
+  LazyList continually wordTable(words, tableSize) take PopulationSize
 
 /**
  * Generates a table state with randomly placed words from a given list of words.

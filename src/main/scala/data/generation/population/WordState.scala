@@ -9,4 +9,9 @@ package data.generation.population
  * @param layout      layout of the word: 0 - horizontal, 1 - vertical
  */
 
-case class WordState(word: String, startRow: Int, startColumn: Int, layout: Layout)
+case class WordState(
+  word: String,
+  startRow: Int,
+  startColumn: Int,
+  layout: Layout
+)

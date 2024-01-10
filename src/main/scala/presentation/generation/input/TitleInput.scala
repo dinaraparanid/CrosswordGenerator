@@ -1,47 +1,32 @@
 package presentation.generation.input
 
 import data.app.{AppConfig, InputStates, resetTitle}
-import presentation.ui.Theme
-import presentation.ui.utils.{PlaceholderTextComponent, combine, removeCaretListeners}
-import presentation.{appFontStream, appThemeStream, inputStates}
+import presentation.inputStates
+import presentation.ui.utils.PlaceholderTextComponent
 
-import zio.{Runtime, URIO, Unsafe, ZIO}
+import zio.{RIO, Runtime, Unsafe, ZIO}
 
 import javax.swing.JTextField
 
 private val TitlePlaceholder = "Crossword title"
-private val TitleMaxWidth = 20
 
-def TitleInput(): URIO[AppConfig & InputStates, JTextField] =
-  val input = new JTextField
-    with PlaceholderTextComponent:
-    setPlaceholder(TitlePlaceholder)
-    setColumns(TitleMaxWidth)
-
+def TitleInput(): RIO[AppConfig & InputStates, JTextField] =
+  val input = initialInputField
   val runtime = Runtime.default
 
-  def recompose(
-    theme:       Theme,
-    typeface:    String,
-    inputStates: InputStates
-  ): Unit =
-    input setBackground theme.backgroundColor.darker()
-    input setForeground theme.fontColor
-    input setPlaceholderColor theme.primaryColor
-    input setFont labelFont(typeface)
-
-    input.removeCaretListeners()
+  def setCaretListener(inputStates: InputStates): Unit =
     input addCaretListener: _ ⇒
-      Unsafe.unsafe { implicit unsafe ⇒
+      Unsafe unsafe { implicit unsafe ⇒
         runtime.unsafe.runToFuture:
           inputStates resetTitle input.getText
       }
 
   for {
-    theme  ← appThemeStream()
-    font   ← appFontStream()
     inputs ← inputStates()
-    _      ← combine(theme, font).foreach { case (t, f) ⇒
-      ZIO attempt recompose(t, f, inputs)
-    }.fork
+    _      ← ZIO attempt setCaretListener(inputs)
   } yield input
+
+private def initialInputField: JTextField =
+  new JTextField
+    with PlaceholderTextComponent:
+    setPlaceholder(TitlePlaceholder)

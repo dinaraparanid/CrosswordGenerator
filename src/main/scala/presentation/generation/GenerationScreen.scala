@@ -1,35 +1,59 @@
 package presentation.generation
 
 import data.app.{AppConfig, InputStates}
-import presentation.appThemeStream
 import presentation.generation.input.InputPanel
-import presentation.ui.Theme
+import presentation.ui.utils.{VerticalSpacer, gbc}
+
 import zio.{RIO, ZIO}
 
 import java.awt.{GridBagConstraints, GridBagLayout}
-import javax.swing.JPanel
+import javax.swing.{JLabel, JPanel}
 
 def GenerationScreen(): RIO[AppConfig & InputStates, JPanel] =
   val panel = new JPanel:
     setLayout(GridBagLayout())
 
   def setContentOfPanel(inputPanel: JPanel): Unit =
-    panel.add(inputPanel, initialConstraints)
-
-  def recompose(theme: Theme): Unit =
-    panel setBackground theme.backgroundColor
+    panel.add(VerticalSpacer(20), topSpacerGBC)
+    panel.add(inputPanel, inputGBC)
+    panel.add(JLabel("TODO: Crossword Sheet"), crosswordSheetGBC)
+    panel.add(VerticalSpacer(40), bottomSpacerGBC)
 
   for {
-    themes ← appThemeStream()
     inputs ← InputPanel()
-
-    _ ← ZIO attempt setContentOfPanel(inputs)
-    _ ← themes.foreach(ZIO attempt recompose(_)).fork
+    _      ← ZIO attempt setContentOfPanel(inputs)
   } yield panel
 
-private def initialConstraints: GridBagConstraints =
-  new GridBagConstraints:
-    anchor = GridBagConstraints.FIRST_LINE_START
-    fill = GridBagConstraints.BOTH
-    /*gridx = 0
-    gridy = 0*/
+private def topSpacerGBC: GridBagConstraints =
+  gbc(
+    gridY = 0,
+    gridX = 0,
+    weightX = 1,
+    fil = GridBagConstraints.HORIZONTAL
+  )
+
+private def inputGBC: GridBagConstraints =
+  gbc(
+    gridX = 0,
+    gridY = 1,
+    weightX = 1,
+    weightY = 1,
+    fil = GridBagConstraints.BOTH
+  )
+
+private def crosswordSheetGBC: GridBagConstraints =
+  gbc(
+    gridX = 1,
+    gridY = 1,
+    weightX = 1,
+    weightY = 1,
+    fil = GridBagConstraints.BOTH
+  )
+
+private def bottomSpacerGBC: GridBagConstraints =
+  gbc(
+    gridX = 0,
+    gridY = 2,
+    weightX = 1,
+    fil = GridBagConstraints.HORIZONTAL
+  )

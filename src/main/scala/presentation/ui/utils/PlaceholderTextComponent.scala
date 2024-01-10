@@ -36,7 +36,7 @@ trait PlaceholderTextComponent extends JTextComponent {
 
     val lineHeight = graphics
       .getFontMetrics(_placeholderFont)
-      .getHeight
+      .getMaxAscent
 
     _placeholder
       .split("\n")

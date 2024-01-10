@@ -1,7 +1,7 @@
 package presentation.ui.utils
 
 import java.awt.geom.{Area, Rectangle2D, RoundRectangle2D}
-import java.awt.{Graphics, Graphics2D}
+import java.awt.{AlphaComposite, BasicStroke, Color, Graphics, Graphics2D, Stroke}
 import javax.swing.JComponent
 
 trait RoundedComponent extends JComponent:
@@ -12,10 +12,18 @@ trait RoundedComponent extends JComponent:
   private var _bottomLeftRadius: Int = 0
   private var _bottomRightRadius: Int = 0
 
+  private var _roundedBorderDrawn: Boolean = false
+  private var _roundedBorderColor: Color = getForeground
+  private var _roundedBorderStroke: Stroke = defaultStroke
+
   def topLeftRadius: Int = _topLeftRadius
   def topRightRadius: Int = _topRightRadius
   def bottomLeftRadius: Int = _bottomLeftRadius
   def bottomRightRadius: Int = _bottomRightRadius
+
+  def isRoundedBorderDrawn: Boolean = _roundedBorderDrawn
+  def roundedBorderColor: Color = _roundedBorderColor
+  def roundedBorderStroke: Stroke = _roundedBorderStroke
 
   def setTopLeftRadius(radius: Int): Unit =
     _topLeftRadius = radius
@@ -39,11 +47,32 @@ trait RoundedComponent extends JComponent:
     setBottomLeftRadius(radius)
     setBottomRightRadius(radius)
 
+  def setRoundedBorderDrawn(isDrawn: Boolean): Unit =
+    _roundedBorderDrawn = isDrawn
+    repaint()
+
+  def setRoundedBorderColor(color: Color): Unit =
+    _roundedBorderColor = color
+    repaint()
+
+  def setRoundedBorderStroke(stroke: Stroke): Unit =
+    _roundedBorderStroke = stroke
+    repaint()
+
   override def paintComponent(g: Graphics): Unit =
     val g2 = g.create().asInstanceOf[Graphics2D]
     g2.setQualityRenderingHints()
     g2 setColor getBackground
     g2 fill this.roundArea
+
+    if _roundedBorderDrawn then
+      g2 setStroke _roundedBorderStroke
+      g2 setColor _roundedBorderColor
+      g2 setComposite AlphaComposite.SrcIn
+      g2 setClip this.roundArea
+      g2 draw this.roundArea
+
+    g2.dispose()
     super.paintComponent(g)
 
   protected def roundArea: Area =
@@ -108,3 +137,6 @@ extension (component: RoundedComponent)
     area += Area(Rectangle2D.Double(0, 0, width - roundX / 2, height))
     area += Area(Rectangle2D.Double(0, 0, width, height - roundY / 2))
     area
+
+private def defaultStroke: Stroke =
+  BasicStroke(5, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
