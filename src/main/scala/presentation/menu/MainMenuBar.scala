@@ -10,12 +10,14 @@ import javax.swing.{JMenu, JMenuBar}
 def MainMenuBar(): RIO[AppConfig & NavigationService, JMenuBar] =
   val menu = new JMenuBar:
     add(FileMenu())
+    add(EditMenu())
 
-  def setContentOfMenu(settingsMenu: JMenu): Unit =
-    menu add settingsMenu
+  def setContentOfMenu(viewMenu: JMenu): Unit =
+    menu add viewMenu
+    menu add HelpMenu()
 
   for {
-    settingsMenu ← SettingsMenu()
-    _            ← ZIO attempt
-      setContentOfMenu(settingsMenu)
+    viewMenu ← ViewMenu()
+    _        ← ZIO attempt
+      setContentOfMenu(viewMenu)
   } yield menu

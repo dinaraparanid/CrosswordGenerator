@@ -39,6 +39,8 @@ object Application extends ZIOAppDefault:
 
 private def setup(): Unit =
   FlatMaterialPalenightIJTheme.setup()
+  System.err.close()
+
   val ge = GraphicsEnvironment.getLocalGraphicsEnvironment
   ge registerFont "./res/pristina.ttf"
 
