@@ -1,27 +1,31 @@
 package data.app
 
-import zio.{UIO, ULayer, ZLayer}
+import domain.session.sessionDocumentPath
+
 import zio.stream.{SubscriptionRef, UStream}
+import zio.{UIO, ULayer, ZLayer}
 
 import scala.util.matching.Regex
 
 private val CrosswordCorrectInputRegex: Regex =
-  "\\s*((.*) - (.*)\\s*)+".r
+  "\\s*((.*) - (.*)\\s*){2,}".r
 
-case class InputStates(
+case class SessionStates(
   titleInput: SubscriptionRef[String],
-  wordsInput: SubscriptionRef[String]
+  wordsInput: SubscriptionRef[String],
+  sessionDoc: SubscriptionRef[String]
 )
 
-object InputStates:
-  val layer: ULayer[InputStates] =
+object SessionStates:
+  val layer: ULayer[SessionStates] =
     ZLayer:
       for {
         title ← SubscriptionRef make ""
         words ← SubscriptionRef make ""
-      } yield InputStates(title, words)
+        doc   ← SubscriptionRef make sessionDocumentPath
+      } yield SessionStates(title, words, doc)
 
-extension (states: InputStates)
+extension (states: SessionStates)
   def resetTitle(title: String): UIO[Unit] =
     states.titleInput set title
 

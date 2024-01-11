@@ -1,7 +1,7 @@
 package presentation.generation.input
 
-import data.app.{AppConfig, InputStates, resetTitle}
-import presentation.inputStates
+import data.app.{AppConfig, SessionStates, resetTitle}
+import presentation.sessionStates
 import presentation.ui.utils.PlaceholderTextComponent
 
 import zio.{RIO, Runtime, Unsafe, ZIO}
@@ -10,11 +10,11 @@ import javax.swing.JTextField
 
 private val TitlePlaceholder = "Crossword title"
 
-def TitleInput(): RIO[AppConfig & InputStates, JTextField] =
+def TitleInput(): RIO[AppConfig & SessionStates, JTextField] =
   val input = initialInputField
   val runtime = Runtime.default
 
-  def setCaretListener(inputStates: InputStates): Unit =
+  def setCaretListener(inputStates: SessionStates): Unit =
     input addCaretListener: _ ⇒
       Unsafe unsafe { implicit unsafe ⇒
         runtime.unsafe.runToFuture:
@@ -22,7 +22,7 @@ def TitleInput(): RIO[AppConfig & InputStates, JTextField] =
       }
 
   for {
-    inputs ← inputStates()
+    inputs ← sessionStates()
     _      ← ZIO attempt setCaretListener(inputs)
   } yield input
 

@@ -1,28 +1,32 @@
 package presentation.generation
 
-import data.app.{AppConfig, InputStates}
+import data.app.{AppConfig, SessionStates}
 import presentation.generation.input.InputPanel
 import presentation.ui.utils.{HorizontalSpacer, VerticalSpacer, gbc}
 
 import zio.{RIO, ZIO}
 
 import java.awt.{GridBagConstraints, GridBagLayout}
-import javax.swing.JPanel
+import javax.swing.{JPanel, JSplitPane}
 
-def GenerationScreen(): RIO[AppConfig & InputStates, JPanel] =
+def GenerationScreen(): RIO[AppConfig & SessionStates, JPanel] =
   val panel = new JPanel:
     setLayout(GridBagLayout())
 
-  def setContentOfPanel(inputPanel: JPanel): Unit =
+  def setContentOfPanel(
+    inputPanel:    JPanel,
+    crosswordView: JSplitPane
+  ): Unit =
     panel.add(VerticalSpacer(height = 20), topSpacerGBC)
     panel.add(inputPanel, inputGBC)
     panel.add(HorizontalSpacer(width = 10), betweenSpacerGBC)
-    panel.add(CrosswordSheetView(), crosswordSheetGBC)
+    panel.add(crosswordView, crosswordSheetGBC)
     panel.add(VerticalSpacer(height = 40), bottomSpacerGBC)
 
   for {
-    inputs ← InputPanel()
-    _      ← ZIO attempt setContentOfPanel(inputs)
+    inputs    ← InputPanel()
+    crossword ← CrosswordSheetView()
+    _         ← ZIO attempt setContentOfPanel(inputs, crossword)
   } yield panel
 
 private def topSpacerGBC: GridBagConstraints =

@@ -1,7 +1,7 @@
 package presentation.generation.input
 
-import data.app.{AppConfig, InputStates, resetWords}
-import presentation.inputStates
+import data.app.{AppConfig, SessionStates, resetWords}
+import presentation.sessionStates
 import presentation.ui.utils.PlaceholderTextComponent
 
 import zio.{RIO, Runtime, Unsafe, ZIO}
@@ -19,7 +19,7 @@ private val WordsInitialText =
     |Minotaur - Cretan monster with the body of a man and the head of a bull, who lived in a Labyrinth and was killed by Theseus.
     |Scimitar - bladed stabbing and slashing edged weapon with a long single-edged blade having a double bend; something between a saber and a cleaver.""".stripMargin
 
-def WordsInput(): RIO[AppConfig & InputStates, JPanel] =
+def WordsInput(): RIO[AppConfig & SessionStates, JPanel] =
   val input = initialInputArea
 
   val panel = new JPanel(BorderLayout()):
@@ -27,7 +27,7 @@ def WordsInput(): RIO[AppConfig & InputStates, JPanel] =
 
   val runtime = Runtime.default
 
-  def setCaretListener(inputStates: InputStates): Unit =
+  def setCaretListener(inputStates: SessionStates): Unit =
     input addCaretListener: _ ⇒
       Unsafe unsafe { implicit unsafe ⇒
         runtime.unsafe.runToFuture:
@@ -35,7 +35,7 @@ def WordsInput(): RIO[AppConfig & InputStates, JPanel] =
       }
 
   for {
-    inputs ← inputStates()
+    inputs ← sessionStates()
     _      ← ZIO attempt setCaretListener(inputs)
   } yield panel
 

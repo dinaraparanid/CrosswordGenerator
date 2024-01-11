@@ -1,7 +1,7 @@
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMaterialPalenightIJTheme
 
 import data.app.navigation.NavigationService
-import data.app.{AppConfig, InputStates}
+import data.app.{AppConfig, SessionStates}
 import presentation.MainFrame
 
 import zio.{Promise, RIO, UIO, ULayer, ZIO, ZIOAppDefault}
@@ -11,10 +11,10 @@ import java.io.File
 import javax.swing.JFrame
 
 object Application extends ZIOAppDefault:
-  private val appLayer: ULayer[AppConfig & NavigationService & InputStates] =
-    AppConfig.layer ++ NavigationService.layer ++ InputStates.layer
+  private val appLayer: ULayer[AppConfig & NavigationService & SessionStates] =
+    AppConfig.layer ++ NavigationService.layer ++ SessionStates.layer
 
-  private val appLogic: RIO[AppConfig & NavigationService & InputStates, Unit] =
+  private val appLogic: RIO[AppConfig & NavigationService & SessionStates, Unit] =
     setup()
 
     for {
@@ -25,7 +25,7 @@ object Application extends ZIOAppDefault:
   override def run: RIO[Any, Unit] =
     appLogic provideLayer appLayer
 
-  private def runApplication(): RIO[AppConfig & NavigationService & InputStates, JFrame] =
+  private def runApplication(): RIO[AppConfig & NavigationService & SessionStates, JFrame] =
     for {
       frame ← MainFrame()
       _     ← ZIO attempt (frame setVisible true)

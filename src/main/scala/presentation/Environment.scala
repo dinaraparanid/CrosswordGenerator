@@ -1,33 +1,33 @@
 package presentation
 
-import data.app.{AppConfig, InputStates}
+import data.app.{AppConfig, SessionStates}
 import data.app.navigation.{NavigationService, Navigator}
 
 import zio.{URIO, ZIO}
 import zio.stream.{SubscriptionRef, UStream}
 
 def appConfig(): URIO[AppConfig, AppConfig] =
-  for (env ← ZIO.environment[AppConfig])
+  for env ← ZIO.environment[AppConfig]
     yield env.get[AppConfig]
 
 def appFontRef(): URIO[AppConfig, SubscriptionRef[String]] =
-  for (config ← appConfig())
+  for config ← appConfig()
     yield config.font
 
 def appFontStream(): URIO[AppConfig, UStream[String]] =
-  for (ref ← appFontRef())
+  for ref ← appFontRef()
     yield ref.changes
 
 def navigationService(): URIO[NavigationService, NavigationService] =
-  for (nav ← ZIO.service[NavigationService])
+  for nav ← ZIO.service[NavigationService]
     yield nav
 
 def navigatorRef(): URIO[NavigationService, SubscriptionRef[Option[Navigator]]] =
-  for (service ← navigationService())
+  for service ← navigationService()
     yield service.nav
 
 def navigatorStream(): URIO[NavigationService, UStream[Option[Navigator]]] =
-  for (ref ← navigatorRef())
+  for ref ← navigatorRef()
     yield ref.changes
 
 def navigator(): URIO[NavigationService, Option[Navigator]] =
@@ -36,22 +36,48 @@ def navigator(): URIO[NavigationService, Option[Navigator]] =
     nav ← ref.get
   } yield nav
 
-def inputStates(): URIO[InputStates, InputStates] =
-  for (inp ← ZIO.service[InputStates])
-    yield inp
+def sessionStates(): URIO[SessionStates, SessionStates] =
+  for ses ← ZIO.service[SessionStates]
+    yield ses
 
-def titleInputRef(): URIO[InputStates, SubscriptionRef[String]] =
-  for (inp ← inputStates())
-    yield inp.titleInput
+def titleInputRef(): URIO[SessionStates, SubscriptionRef[String]] =
+  for ses ← sessionStates()
+    yield ses.titleInput
 
-def titleInputStream(): URIO[InputStates, UStream[String]] =
-  for (ref ← titleInputRef())
+def titleInputStream(): URIO[SessionStates, UStream[String]] =
+  for ref ← titleInputRef()
     yield ref.changes
 
-def wordsInputRef(): URIO[InputStates, SubscriptionRef[String]] =
-  for (inp ← inputStates())
-    yield inp.wordsInput
+def titleInput(): URIO[SessionStates, String] =
+  for {
+    ref   ← titleInputRef()
+    title ← ref.get
+  } yield title
 
-def wordsInputStream(): URIO[InputStates, UStream[String]] =
-  for (ref ← wordsInputRef())
+def wordsInputRef(): URIO[SessionStates, SubscriptionRef[String]] =
+  for ses ← sessionStates()
+    yield ses.wordsInput
+
+def wordsInputStream(): URIO[SessionStates, UStream[String]] =
+  for ref ← wordsInputRef()
     yield ref.changes
+
+def wordsInput(): URIO[SessionStates, String] =
+  for {
+    ref   ← wordsInputRef()
+    words ← ref.get
+  } yield words
+
+def sessionDocRef(): URIO[SessionStates, SubscriptionRef[String]] =
+  for ses ← sessionStates()
+    yield ses.sessionDoc
+
+def sessionDocStream(): URIO[SessionStates, UStream[String]] =
+  for ref ← sessionDocRef()
+    yield ref.changes
+
+def sessionDoc(): URIO[SessionStates, String] =
+  for {
+    ref ← sessionDocRef()
+    doc ← ref.get
+  } yield doc
