@@ -16,8 +16,8 @@ def MainMenuBar(): RIO[AppConfig & NavigationService, JMenuBar] =
     menu add viewMenu
     menu add HelpMenu()
 
-  for {
+  for
     viewMenu ← ViewMenu()
     _        ← ZIO attempt
       setContentOfMenu(viewMenu)
-  } yield menu
+  yield menu

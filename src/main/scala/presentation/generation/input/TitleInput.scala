@@ -21,10 +21,10 @@ def TitleInput(): RIO[AppConfig & SessionStates, JTextField] =
           inputStates resetTitle input.getText
       }
 
-  for {
+  for
     inputs ← sessionStates()
     _      ← ZIO attempt setCaretListener(inputs)
-  } yield input
+  yield input
 
 private def initialInputField: JTextField =
   new JTextField

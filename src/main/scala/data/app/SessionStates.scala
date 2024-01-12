@@ -2,6 +2,7 @@ package data.app
 
 import domain.session.sessionDocumentPath
 
+import zio.channel.Channel
 import zio.stream.{SubscriptionRef, UStream}
 import zio.{UIO, ULayer, ZLayer}
 
@@ -13,17 +14,19 @@ private val CrosswordCorrectInputRegex: Regex =
 case class SessionStates(
   titleInput: SubscriptionRef[String],
   wordsInput: SubscriptionRef[String],
-  sessionDoc: SubscriptionRef[String]
+  sessionDoc: SubscriptionRef[String],
+  pageChan:   Channel[Boolean]
 )
 
 object SessionStates:
   val layer: ULayer[SessionStates] =
     ZLayer:
       for {
-        title ← SubscriptionRef make ""
-        words ← SubscriptionRef make ""
-        doc   ← SubscriptionRef make sessionDocumentPath
-      } yield SessionStates(title, words, doc)
+        title    ← SubscriptionRef make ""
+        words    ← SubscriptionRef make ""
+        doc      ← SubscriptionRef make sessionDocumentPath
+        pageChan ← Channel.make[Boolean]
+      } yield SessionStates(title, words, doc, pageChan)
 
 extension (states: SessionStates)
   def resetTitle(title: String): UIO[Unit] =

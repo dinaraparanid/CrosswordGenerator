@@ -8,14 +8,14 @@ import zio.UIO
 import scala.annotation.tailrec
 
 def packed(tableState: TableState): UIO[TableState] =
-  for {
+  for
     borders ← minTableSizePar(tableState.table)
     (top, bottom, left, right) = borders
 
     width     = right - left + 1
     height    = bottom - top + 1
     tableSize = math.max(width, height)
-  } yield packed(tableState, tableSize, top, left)
+  yield packed(tableState, tableSize, top, left)
 
 private def packed(
   tableState: TableState,

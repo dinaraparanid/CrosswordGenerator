@@ -11,5 +11,6 @@ lazy val root = (project in file("."))
     libraryDependencies += "com.formdev" % "flatlaf-intellij-themes" % "3.2.5",
     libraryDependencies += "com.github.pcorless.icepdf" % "icepdf-core" % "7.1.3",
     libraryDependencies += "com.github.pcorless.icepdf" % "icepdf-viewer" % "7.1.3",
-    libraryDependencies += "com.itextpdf" % "itext-core" % "8.0.2"
+    libraryDependencies += "com.itextpdf" % "itext-core" % "8.0.2",
+    libraryDependencies += "com.carlosedp" %% "zio-channel" % "0.5.5"
   )

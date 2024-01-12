@@ -1,9 +1,5 @@
 package domain.session
 
-import data.app.SessionStates
-import presentation.wordsInput
-import zio.URIO
-
 private val WordsMeaningRegex = "(.*) - (.*)".r
 
 def parsedWordsWithMeanings(wordsInput: String): Map[String, String] =

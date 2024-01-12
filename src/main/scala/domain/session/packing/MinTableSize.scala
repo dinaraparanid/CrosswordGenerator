@@ -6,13 +6,13 @@ import domain.generation.population.EmptyLetter
 import zio.{UIO, ZIO}
 
 private def minTableSizePar(table: Table): UIO[(Int, Int, Int, Int)] =
-  for {
+  for
     top    ← ZIO.succeedBlocking(topBorder(table)).fork
     bottom ← ZIO.succeedBlocking(bottomBorder(table)).fork
     left   ← ZIO.succeedBlocking(leftBorder(table)).fork
     right  ← ZIO.succeedBlocking(rightBorder(table)).fork
     res    ← (top <*> bottom <*> left <*> right).join
-  } yield res
+  yield res
 
 private def topBorder(table: Table): Int =
   scanBorders(
@@ -58,13 +58,13 @@ private def scanBorders(
   indices:     (Int, Int) ⇒ (Int, Int),
   border:      (Int, Int) ⇒ Int
 ): Int =
-  val res = for {
+  val res = for
     i1 ← firstRange
     i2 ← secondRange
 
     (row, column) = indices(i1, i2)
     value = table(row)(column)
     res = border(row, column) if value != EmptyLetter
-  } yield res
+  yield res
 
   res.head

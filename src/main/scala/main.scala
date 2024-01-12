@@ -17,25 +17,25 @@ object Application extends ZIOAppDefault:
   private val appLogic: RIO[AppConfig & NavigationService & SessionStates, Unit] =
     setup()
 
-    for {
+    for
       _ ← runApplication()
       _ ← waitUntilClosed()
-    } yield ()
+    yield ()
 
   override def run: RIO[Any, Unit] =
     appLogic provideLayer appLayer
 
   private def runApplication(): RIO[AppConfig & NavigationService & SessionStates, JFrame] =
-    for {
+    for
       frame ← MainFrame()
       _     ← ZIO attempt (frame setVisible true)
-    } yield frame
+    yield frame
 
   private def waitUntilClosed(): UIO[Unit] =
-    for {
+    for
       closeEffect ← Promise.make[Nothing, Nothing]
       _           ← closeEffect.await
-    } yield ()
+    yield ()
 
 private def setup(): Unit =
   FlatMaterialPalenightIJTheme.setup()

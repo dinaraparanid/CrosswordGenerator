@@ -17,17 +17,17 @@ def ViewMenu(): RIO[AppConfig & NavigationService, JMenu] =
     menu add appearanceItem
     menu add FontMenuItem()
 
-  for {
+  for
     appearanceItem ← ThemeMenuItem()
     _              ← ZIO attempt
       setContentOfMenu(appearanceItem)
-  } yield menu
+  yield menu
 
 private def ThemeMenuItem(): URIO[AppConfig & NavigationService, JMenuItem] =
-  for {
+  for
     conf ← appConfig()
     nav  ← navigator()
-  } yield new JMenuItem("Theme"):
+  yield new JMenuItem("Theme"):
     setAccelerator(ctrlKey(KeyEvent.VK_U))
     addActionListener { _ ⇒
       nav foreach { n ⇒ conf.resetTheme(n.frame) }

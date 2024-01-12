@@ -29,7 +29,7 @@ def InputPanel(): RIO[AppConfig & SessionStates, JPanel] =
     panel.add(VerticalSpacer(height = 5), spacer4GBC)
     panel.add(generateButton, generateButtonGBC)
 
-  for {
+  for
     titleInput     ← TitleInput()
     wordsInput     ← WordsInput()
     generateButton ← GenerateButton()
@@ -40,7 +40,7 @@ def InputPanel(): RIO[AppConfig & SessionStates, JPanel] =
         wordsInput = wordsInput,
         generateButton = generateButton
       )
-  } yield panel
+  yield panel
 
 private def TitleLabel(): JLabel = JLabel("Title")
 private def WordsLabel(): JLabel = JLabel("Words")

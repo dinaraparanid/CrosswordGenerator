@@ -23,11 +23,11 @@ def GenerationScreen(): RIO[AppConfig & SessionStates, JPanel] =
     panel.add(crosswordView, crosswordSheetGBC)
     panel.add(VerticalSpacer(height = 40), bottomSpacerGBC)
 
-  for {
+  for
     inputs    ← InputPanel()
     crossword ← CrosswordSheetView()
     _         ← ZIO attempt setContentOfPanel(inputs, crossword)
-  } yield panel
+  yield panel
 
 private def topSpacerGBC: GridBagConstraints =
   gbc(

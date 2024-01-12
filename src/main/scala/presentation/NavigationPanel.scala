@@ -18,8 +18,8 @@ def NavigationPanel(): RIO[AppConfig & NavigationService & SessionStates, (CardL
   def setContentOfPanel(generationScreen: JPanel): Unit =
     panel.add(generationScreen, Navigator.GenerateScreenNav)
 
-  for {
+  for
     generationScreen ← GenerationScreen()
     _                ← ZIO attempt
       setContentOfPanel(generationScreen)
-  } yield (card, panel)
+  yield (card, panel)

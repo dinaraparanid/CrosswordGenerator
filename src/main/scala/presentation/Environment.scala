@@ -4,6 +4,7 @@ import data.app.{AppConfig, SessionStates}
 import data.app.navigation.{NavigationService, Navigator}
 
 import zio.{URIO, ZIO}
+import zio.channel.Channel
 import zio.stream.{SubscriptionRef, UStream}
 
 def appConfig(): URIO[AppConfig, AppConfig] =
@@ -31,10 +32,10 @@ def navigatorStream(): URIO[NavigationService, UStream[Option[Navigator]]] =
     yield ref.changes
 
 def navigator(): URIO[NavigationService, Option[Navigator]] =
-  for {
+  for
     ref ← navigatorRef()
     nav ← ref.get
-  } yield nav
+  yield nav
 
 def sessionStates(): URIO[SessionStates, SessionStates] =
   for ses ← ZIO.service[SessionStates]
@@ -49,10 +50,10 @@ def titleInputStream(): URIO[SessionStates, UStream[String]] =
     yield ref.changes
 
 def titleInput(): URIO[SessionStates, String] =
-  for {
+  for
     ref   ← titleInputRef()
     title ← ref.get
-  } yield title
+  yield title
 
 def wordsInputRef(): URIO[SessionStates, SubscriptionRef[String]] =
   for ses ← sessionStates()
@@ -63,10 +64,10 @@ def wordsInputStream(): URIO[SessionStates, UStream[String]] =
     yield ref.changes
 
 def wordsInput(): URIO[SessionStates, String] =
-  for {
+  for
     ref   ← wordsInputRef()
     words ← ref.get
-  } yield words
+  yield words
 
 def sessionDocRef(): URIO[SessionStates, SubscriptionRef[String]] =
   for ses ← sessionStates()
@@ -77,7 +78,11 @@ def sessionDocStream(): URIO[SessionStates, UStream[String]] =
     yield ref.changes
 
 def sessionDoc(): URIO[SessionStates, String] =
-  for {
+  for
     ref ← sessionDocRef()
     doc ← ref.get
-  } yield doc
+  yield doc
+
+def pageChannel(): URIO[SessionStates, Channel[Boolean]] =
+  for ses ← sessionStates()
+    yield ses.pageChan

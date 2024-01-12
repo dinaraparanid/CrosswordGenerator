@@ -19,7 +19,7 @@ def MainFrame(): RIO[AppConfig & NavigationService & SessionStates, JFrame] =
     frame add navPanel
     frame setJMenuBar mainMenu
 
-  for {
+  for
     cardPanel     ← NavigationPanel()
     (card, panel) = cardPanel
 
@@ -28,4 +28,4 @@ def MainFrame(): RIO[AppConfig & NavigationService & SessionStates, JFrame] =
 
     mainMenu ← MainMenuBar()
     _        ← ZIO attempt setContentOfFrame(panel, mainMenu)
-  } yield frame
+  yield frame

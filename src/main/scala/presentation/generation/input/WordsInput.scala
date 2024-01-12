@@ -34,10 +34,10 @@ def WordsInput(): RIO[AppConfig & SessionStates, JPanel] =
           inputStates resetWords input.getText
       }
 
-  for {
+  for
     inputs ← sessionStates()
     _      ← ZIO attempt setCaretListener(inputs)
-  } yield panel
+  yield panel
 
 private def initialInputArea: JTextArea =
   new JTextArea
