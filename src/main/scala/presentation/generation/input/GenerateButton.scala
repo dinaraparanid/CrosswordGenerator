@@ -1,17 +1,16 @@
 package presentation.generation.input
 
-import com.itextpdf.layout.borders.Border
-import com.itextpdf.layout.element.{Cell, Paragraph, Table}
-import com.itextpdf.layout.properties.{HorizontalAlignment, TextAlignment}
+import com.itextpdf.layout.element.AreaBreak
+import com.itextpdf.layout.properties.AreaBreakType
 
 import data.app.{SessionStates, isInputCorrectStream}
-import data.generation.population.{TableState, Table as CrosswordTable}
+import data.generation.population.TableState
 
 import domain.generation.generation
-import domain.generation.population.EmptyLetter
 import domain.session.packing.packed
 import domain.session.{SessionDocumentWriter, parsedWordsWithMeanings}
 
+import presentation.generation.pdf.{AnswerTable, HeaderParagraph, MeaningsTable, WorksheetTable}
 import presentation.sessionStates
 import presentation.ui.utils.{combine, removeActionListeners}
 
@@ -20,10 +19,7 @@ import zio.{RIO, Runtime, UIO, URIO, Unsafe, ZIO}
 
 import javax.swing.JButton
 
-import scala.annotation.tailrec
 import scala.util.Using
-
-private val DrainedCell = '*'
 
 def GenerateButton(): URIO[SessionStates, JButton] =
   val button = new JButton("Generate"):
@@ -43,15 +39,18 @@ def GenerateButton(): URIO[SessionStates, JButton] =
     button addActionListener: _ ⇒
       Unsafe.unsafe { implicit unsafe ⇒
         runtime.unsafe.runToFuture:
-          for {
-            table ← generateCrossword(wordsInput)
-            _     ← storeCrossword(
+          for
+            tabWithMeans      ← generateCrossword(wordsInput)
+            (table, meanings) = tabWithMeans
+
+            _ ← showCrossword(
               docPath = sessionDoc,
               titleInput = titleInput,
               tableState = table,
+              wordsWithMeanings = meanings,
               pageChan = pageChan
             )
-          } yield ()
+          yield ()
       }
 
   for
@@ -74,7 +73,7 @@ def GenerateButton(): URIO[SessionStates, JButton] =
       .fork
   yield button
 
-private def generateCrossword(wordsInput: String): UIO[TableState] =
+private def generateCrossword(wordsInput: String): UIO[(TableState, Map[String, String])] =
   for
     wordsWithMeanings ← ZIO succeedBlocking
       parsedWordsWithMeanings(wordsInput)
@@ -89,106 +88,27 @@ private def generateCrossword(wordsInput: String): UIO[TableState] =
       generation(words, tabSize)
 
     packedTab ← packed(table)
-  yield packedTab
+  yield (packedTab, wordsWithMeanings)
 
 private def requiredTableSize(words: Iterable[String]): Int =
   val maxLength = words.map(_.length).max
   val size = words.size
   math.max(maxLength, size) * 2
 
-private def storeCrossword(
-  docPath:    String,
-  titleInput: String,
-  tableState: TableState,
-  pageChan:   Channel[Boolean]
+private def showCrossword(
+  docPath:           String,
+  titleInput:        String,
+  tableState:        TableState,
+  wordsWithMeanings: Map[String, String],
+  pageChan:          Channel[Boolean]
 ): RIO[Any, Unit] =
-  Using(SessionDocumentWriter(docPath)) { doc ⇒
-    doc add headerParagraph(titleInput)
-    doc add answerTable(tableState)
-  }
+  Using(SessionDocumentWriter(docPath)): doc ⇒
+    doc add HeaderParagraph(titleInput)
+    doc add (WorksheetTable(tableState) setMarginTop 25)
+    doc add (MeaningsTable(tableState, wordsWithMeanings) setMarginTop 25)
+    doc add AreaBreak(AreaBreakType.NEXT_PAGE)
+    doc add HeaderParagraph("Answers")
+    doc add (AnswerTable(tableState) setMarginTop 25)
 
-  (pageChan send true) mapError (err ⇒ Exception(err.toString))
-
-private def headerParagraph(text: String): Paragraph =
-  Paragraph(text)
-    .setTextAlignment(TextAlignment.CENTER)
-    .setFontSize(24)
-    .setBold()
-
-private def answerTable(tableState: TableState): Table =
-  val pdfTable = Table(tableState.table.length)
-    .setBorder(Border.NO_BORDER)
-    .setHorizontalAlignment(HorizontalAlignment.CENTER)
-    .setTextAlignment(TextAlignment.CENTER)
-    .setFontSize(16)
-    .setBold()
-
-  val TableState(tab, _) = tableState
-  val table = tab map (_.clone)
-
-  def tableCell(row: Int, column: Int): Option[Cell] =
-    val char = table(row)(column)
-
-    char match
-      case DrainedCell ⇒ Option.empty
-      case EmptyLetter ⇒ Option(fatCell(table, row, column))
-      case _           ⇒ Option(Cell() add Paragraph(char.toString))
-
-  val cellList = for
-    row  ← table.indices
-    col  ← table.indices
-    cell ← tableCell(row, col)
-  yield cell
-
-  @tailrec
-  def putCells(
-    cells:  List[Cell] = cellList.toList,
-    pdfTab: Table = pdfTable
-  ): Table =
-    cells match
-      case Nil          ⇒ pdfTab
-      case head :: next ⇒
-        putCells(next, pdfTab addCell head)
-
-  putCells()
-
-def fatCell(
-  table:       CrosswordTable,
-  startRow:    Int,
-  startColumn: Int
-): Cell =
-  @tailrec
-  def freeCellsInRow(
-    row:       Int,
-    curColumn: Int = startColumn,
-    count:     Int = 0
-  ): Int =
-    if curColumn >= table.length then
-      return count
-
-    table(row)(curColumn) match
-      case EmptyLetter ⇒ freeCellsInRow(row, curColumn + 1, count + 1)
-      case _           ⇒ count
-
-  @tailrec
-  def freeRowsWithSameWidth(
-    width:  Int,
-    curRow: Int = startRow,
-    count:  Int = 0
-  ): Int =
-    if curRow >= table.length then
-      return count
-
-    if freeCellsInRow(row = curRow) >= width then
-      freeRowsWithSameWidth(width, curRow + 1, count + 1)
-    else count
-
-  val columns = freeCellsInRow(row = startRow)
-  val rows    = freeRowsWithSameWidth(width = columns)
-
-  for
-    r ← startRow until startRow + rows
-    c ← startColumn until startColumn + columns
-  do table(r)(c) = DrainedCell
-
-  Cell(rows, columns) setBorder Border.NO_BORDER
+  (pageChan send true) mapError:
+    err ⇒ Exception(err.toString)

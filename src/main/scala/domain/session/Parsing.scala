@@ -6,5 +6,5 @@ def parsedWordsWithMeanings(wordsInput: String): Map[String, String] =
   WordsMeaningRegex
     .findAllMatchIn(wordsInput)
     .map { mch ⇒ (mch group 1, mch group 2) }
-    .map { case (w, m) ⇒ (w.toLowerCase, m.toLowerCase) }
+    .map { case (w, m) ⇒ (w.toLowerCase, m) }
     .toMap
