@@ -29,10 +29,10 @@ def WordsInput(): RIO[AppConfig & SessionStates, JPanel] =
 
   def setCaretListener(inputStates: SessionStates): Unit =
     input addCaretListener: _ ⇒
-      Unsafe unsafe { implicit unsafe ⇒
-        runtime.unsafe.runToFuture:
-          inputStates resetWords input.getText
-      }
+      Unsafe unsafe:
+        implicit unsafe ⇒
+          runtime.unsafe.runToFuture: 
+            inputStates resetWords input.getText
 
   for
     inputs ← sessionStates()

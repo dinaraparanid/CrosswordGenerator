@@ -15,4 +15,4 @@ final class Navigator(
     navigateTo(Navigator.GenerateScreenNav)
 
 object Navigator:
-  val GenerateScreenNav = "generate_screen"
+  val GenerateScreenNav: String = "generate_screen"

@@ -51,7 +51,7 @@ def mutation(tableState: TableState) =
 
 private def mutationSelection(
   components: List[Set[WordState]]
-)(using random: Random): MutationSelection = {
+)(using random: Random): MutationSelection =
   @tailrec
   def impl(
     comps:      List[Set[WordState]] = components,
@@ -70,7 +70,6 @@ private def mutationSelection(
 
   val (mutatedWords, notMutatedWords) = impl()
   MutationSelection(mutatedWords, notMutatedWords)
-}
 
 /**
  * Attempts to intersect the given words

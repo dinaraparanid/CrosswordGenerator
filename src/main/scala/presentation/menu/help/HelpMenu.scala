@@ -1,4 +1,4 @@
-package presentation.menu
+package presentation.menu.help
 
 import javax.swing.{JMenu, JMenuItem}
 

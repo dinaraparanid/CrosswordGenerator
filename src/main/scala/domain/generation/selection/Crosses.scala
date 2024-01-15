@@ -19,10 +19,8 @@ type WordsCrosses = Map[WordState, Set[WordState]]
  *         and the value represents the set of word states it intersects with
  */
 
-
 def wordsCrosses(wordStates: List[WordState]): WordsCrosses =
-  val coords = wordsCoords(wordStates)
-  wordsCrosses(coords)
+  wordsCrosses(wordsCoords(wordStates))
 
 /**
  * Creates a map associating each word with the set of word it intersects with
@@ -34,9 +32,9 @@ def wordsCrosses(wordStates: List[WordState]): WordsCrosses =
  */
 
 private def wordsCrosses(wordsCoords: Map[WordState, Set[Coords]]): WordsCrosses =
-  wordsCoords map { case (word, coords) ⇒
-    (word, crosses(word, coords, wordsCoords))
-  }
+  wordsCoords map:
+    case (word, coords) ⇒
+      (word, crosses(word, coords, wordsCoords))
 
 /**
  * Determines the word states that intersect

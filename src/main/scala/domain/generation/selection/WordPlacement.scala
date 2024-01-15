@@ -102,10 +102,9 @@ def canPutWordHorizontal(
 
   val wordState = WordState(word, startRow, startColumn, layout = HORIZONTAL)
 
-  horizontalWords forall { w ⇒
+  horizontalWords forall: w ⇒
     !tooBigNeighbouringBorderHorizontal(wordState, w) &&
       !adjacentHorizontal(wordState, w)
-  }
 
 /**
  * Checks if the word can be placed vertically
@@ -126,7 +125,7 @@ def canPutWordVertical(
   startColumn:   Int,
   table:         Table,
   verticalWords: List[WordState],
-): Boolean = {
+): Boolean =
   if startRow + word.length >= table.length then
     return false
 
@@ -138,8 +137,6 @@ def canPutWordVertical(
 
   val wordState = WordState(word, startRow, startColumn, layout = VERTICAL)
 
-  verticalWords forall { w ⇒
+  verticalWords forall: w ⇒
     !tooBigNeighbouringBorderVertical(wordState, w) &&
       !adjacentVertical(wordState, w)
-  }
-}

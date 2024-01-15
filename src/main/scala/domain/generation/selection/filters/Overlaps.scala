@@ -1,6 +1,6 @@
 package domain.generation.selection.filters
 
-import data.generation.population.{Layout, Table}
+import data.generation.population.Table
 import domain.generation.population.EmptyLetter
 
 /**
@@ -19,10 +19,13 @@ def hasOverlapsHorizontal(
   startRow:    Int,
   startColumn: Int,
   table:       Table
-): Boolean = (startColumn until startColumn + word.length)
-  .map(table(startRow))
-  .zip(word)
-  .exists { case (tab, w) ⇒ tab != EmptyLetter && tab != w }
+): Boolean =
+  (startColumn until startColumn + word.length)
+    .map(table(startRow))
+    .zip(word)
+    .exists:
+      case (tab, w) ⇒
+        tab != EmptyLetter && tab != w
 
 /**
  * Checks whether a vertical word state
@@ -40,7 +43,10 @@ def hasOverlapsVertical(
   startRow:    Int,
   startColumn: Int,
   table:       Table
-): Boolean = (startRow until startRow + word.length)
-  .map { table(_)(startColumn) }
-  .zip { word }
-  .exists { case (tab, w) ⇒ tab != EmptyLetter && tab != w }
+): Boolean =
+  (startRow until startRow + word.length)
+    .map(table(_)(startColumn))
+    .zip(word)
+    .exists:
+      case (tab, w) ⇒
+        tab != EmptyLetter && tab != w

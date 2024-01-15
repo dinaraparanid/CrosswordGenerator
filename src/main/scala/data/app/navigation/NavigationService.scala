@@ -11,6 +11,5 @@ final class NavigationService(val nav: SubscriptionRef[Option[Navigator]]):
     nav set Option(Navigator(panel, card, frame))
 
 object NavigationService:
-  val layer: ULayer[NavigationService] = ZLayer {
+  val layer: ULayer[NavigationService] = ZLayer:
     SubscriptionRef make Option.empty[Navigator] map (NavigationService(_))
-  }

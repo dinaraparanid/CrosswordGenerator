@@ -10,7 +10,7 @@ import domain.generation.generation
 import domain.session.packing.packed
 import domain.session.{SessionDocumentWriter, parsedWordsWithMeanings}
 
-import presentation.generation.pdf.{AnswerTable, HeaderParagraph, MeaningsTable, WorksheetTable}
+import presentation.generation.pdf.*
 import presentation.sessionStates
 import presentation.ui.utils.{combine, removeActionListeners}
 
@@ -37,21 +37,21 @@ def GenerateButton(): URIO[SessionStates, JButton] =
     button setEnabled isCrosswordCorrect
     button.removeActionListeners()
     button addActionListener: _ ⇒
-      Unsafe.unsafe { implicit unsafe ⇒
-        runtime.unsafe.runToFuture:
-          for
-            tabWithMeans      ← generateCrossword(wordsInput)
-            (table, meanings) = tabWithMeans
+      Unsafe.unsafe:
+        implicit unsafe ⇒
+          runtime.unsafe.runToFuture:
+            for
+              tabWithMeans ← generateCrossword(wordsInput)
+              (table, meanings) = tabWithMeans
 
-            _ ← showCrossword(
-              docPath = sessionDoc,
-              titleInput = titleInput,
-              tableState = table,
-              wordsWithMeanings = meanings,
-              pageChan = pageChan
-            )
-          yield ()
-      }
+              _ ← showCrossword(
+                docPath = sessionDoc,
+                titleInput = titleInput,
+                tableState = table,
+                wordsWithMeanings = meanings,
+                pageChan = pageChan
+              )
+            yield ()
 
   for
     session           ← sessionStates()
@@ -67,9 +67,9 @@ def GenerateButton(): URIO[SessionStates, JButton] =
       wordsInputsStream,
       sessionDocStream
     )
-      .foreach { case (correct, title, words, doc) ⇒
-        ZIO attempt recompose(correct, title, words, doc, pageChan)
-      }
+      .foreach:
+        case (correct, title, words, doc) ⇒
+          ZIO attempt recompose(correct, title, words, doc, pageChan)
       .fork
   yield button
 
@@ -78,8 +78,7 @@ private def generateCrossword(wordsInput: String): UIO[(TableState, Map[String, 
     wordsWithMeanings ← ZIO succeedBlocking
       parsedWordsWithMeanings(wordsInput)
 
-    words ← ZIO succeedBlocking
-      wordsWithMeanings.keys.toList
+    (words, meanings) = wordsWithMeanings
 
     tabSize ← ZIO succeedBlocking
       requiredTableSize(words)
@@ -88,7 +87,7 @@ private def generateCrossword(wordsInput: String): UIO[(TableState, Map[String, 
       generation(words, tabSize)
 
     packedTab ← packed(table)
-  yield (packedTab, wordsWithMeanings)
+  yield (packedTab, meanings)
 
 private def requiredTableSize(words: Iterable[String]): Int =
   val maxLength = words.map(_.length).max

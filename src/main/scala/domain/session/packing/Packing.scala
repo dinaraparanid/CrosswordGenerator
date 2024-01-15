@@ -46,6 +46,6 @@ private def packedWordStates(
   top:        Int,
   left:       Int
 ): List[WordState] =
-  wordStates map { case WordState(word, startRow, startColumn, layout) ⇒
-    WordState(word, startRow - top, startColumn - left, layout)
-  }
+  wordStates map:
+    case WordState(word, startRow, startColumn, layout) ⇒
+      WordState(word, startRow - top, startColumn - left, layout)

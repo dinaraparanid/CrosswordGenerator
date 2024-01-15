@@ -1,4 +1,4 @@
-package presentation.menu
+package presentation.menu.view
 
 import data.app.AppConfig
 import data.app.navigation.NavigationService
@@ -29,9 +29,8 @@ private def ThemeMenuItem(): URIO[AppConfig & NavigationService, JMenuItem] =
     nav  ← navigator()
   yield new JMenuItem("Theme"):
     setAccelerator(ctrlKey(KeyEvent.VK_U))
-    addActionListener { _ ⇒
+    addActionListener: _ ⇒
       nav foreach { n ⇒ conf.resetTheme(n.frame) }
-    }
 
 private def FontMenuItem(): JMenuItem =
   new JMenuItem("Font"):

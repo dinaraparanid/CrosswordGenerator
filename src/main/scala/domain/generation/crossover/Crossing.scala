@@ -21,10 +21,9 @@ def tryPutCrossing(
   verticalWords:   List[WordState]
 ): Option[WordState] =
   val word = wordState.word
-  tryCrossingStartCoords(word, table, horizontalWords, verticalWords)
-    .map { case CoordsWithLayout(row, column, layout) ⇒
+  tryCrossingStartCoords(word, table, horizontalWords, verticalWords) map:
+    case CoordsWithLayout(row, column, layout) ⇒
       WordState(word, row, column, layout)
-    }
 
 /**
  * Attempts to find starting coordinates for a word on the table,

@@ -94,4 +94,5 @@ private def crossoverWordState(
   )
     .flatten
     .headOption
-    .getOrElse(wordState(wordSt.word, table, horizontalWords, verticalWords))
+    .getOrElse:
+      wordState(wordSt.word, table, horizontalWords, verticalWords)

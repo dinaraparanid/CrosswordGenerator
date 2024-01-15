@@ -1,6 +1,6 @@
 package data.app
 
-import domain.session.sessionDocumentPath
+import domain.session.initialDocPath
 
 import zio.channel.Channel
 import zio.stream.{SubscriptionRef, UStream}
@@ -21,12 +21,12 @@ case class SessionStates(
 object SessionStates:
   val layer: ULayer[SessionStates] =
     ZLayer:
-      for {
+      for
         title    ← SubscriptionRef make ""
         words    ← SubscriptionRef make ""
-        doc      ← SubscriptionRef make sessionDocumentPath
+        doc      ← SubscriptionRef make initialDocPath
         pageChan ← Channel.make[Boolean]
-      } yield SessionStates(title, words, doc, pageChan)
+      yield SessionStates(title, words, doc, pageChan)
 
 extension (states: SessionStates)
   def resetTitle(title: String): UIO[Unit] =
@@ -34,6 +34,9 @@ extension (states: SessionStates)
 
   def resetWords(words: String): UIO[Unit] =
     states.wordsInput set words
+
+  def resetDocPath(docPath: String): UIO[Unit] =
+    states.sessionDoc set docPath
 
   def isInputCorrectStream: UStream[Boolean] =
     states.wordsInput.changes map

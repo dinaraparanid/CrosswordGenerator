@@ -42,7 +42,10 @@ private def putWordHorizontal(
   horizontalWords: List[WordState],
 ): List[WordState] =
   val WordState(word, row, column, _) = wordState
-  (column until column + word.length) foreach { c ⇒ table(row)(c) = word(c - column) }
+
+  (column until column + word.length) foreach: c ⇒
+    table(row)(c) = word(c - column)
+
   wordState :: horizontalWords
 
 /**
@@ -61,5 +64,8 @@ private def putWordVertical(
   verticalWords: List[WordState],
 ): List[WordState] =
   val WordState(word, row, column, _) = wordState
-  (row until row + word.length) foreach { r ⇒ table(r)(column) = word(r - row) }
+
+  (row until row + word.length) foreach: r ⇒
+    table(r)(column) = word(r - row)
+
   wordState :: verticalWords

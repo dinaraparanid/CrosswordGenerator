@@ -37,8 +37,8 @@ private def monitorPageChanges(controller: SwingController): RIO[SessionStates, 
   foreverWhile:
     for
       pageChan ← pageChannel()
-      doc      ← sessionDoc()
       data     ← pageChan.receive mapError (err ⇒ Exception(err.toString))
+      doc      ← sessionDoc()
       _        ← ZIO attempt revalidateCrosswordPage(controller, doc, data)
     yield data
 
@@ -48,4 +48,4 @@ private def revalidateCrosswordPage(
   makeUpd:    Boolean
 ): Unit =
   if makeUpd then
-    controller.openDocument(doc)
+    controller openDocument doc

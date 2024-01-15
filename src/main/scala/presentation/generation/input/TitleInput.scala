@@ -16,10 +16,10 @@ def TitleInput(): RIO[AppConfig & SessionStates, JTextField] =
 
   def setCaretListener(inputStates: SessionStates): Unit =
     input addCaretListener: _ ⇒
-      Unsafe unsafe { implicit unsafe ⇒
-        runtime.unsafe.runToFuture:
-          inputStates resetTitle input.getText
-      }
+      Unsafe unsafe:
+        implicit unsafe ⇒
+          runtime.unsafe.runToFuture: 
+            inputStates resetTitle input.getText
 
   for
     inputs ← sessionStates()

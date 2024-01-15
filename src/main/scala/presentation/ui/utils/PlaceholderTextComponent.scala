@@ -3,7 +3,7 @@ package presentation.ui.utils
 import java.awt.{Color, Font, Graphics, Graphics2D}
 import javax.swing.text.JTextComponent
 
-trait PlaceholderTextComponent extends JTextComponent {
+trait PlaceholderTextComponent extends JTextComponent:
   private var _placeholder: String = ""
   private var _placeholderColor: Color = getDisabledTextColor
   private var _placeholderFont: Font = getFont
@@ -24,7 +24,7 @@ trait PlaceholderTextComponent extends JTextComponent {
     _placeholderFont = font
     repaint()
 
-  override def paintComponent(g: Graphics): Unit = {
+  override def paintComponent(g: Graphics): Unit =
     super.paintComponent(g)
 
     if _placeholder.isBlank || !getText.isBlank then
@@ -41,12 +41,10 @@ trait PlaceholderTextComponent extends JTextComponent {
     _placeholder
       .split("\n")
       .zipWithIndex
-      .foreach { case (s, i) ⇒
-        graphics.drawString(
-          s,
-          getInsets.left,
-          lineHeight * (i + 1) + getInsets.top,
-        )
-      }
-  }
-}
+      .foreach:
+        case (s, i) ⇒
+          graphics.drawString(
+            s,
+            getInsets.left,
+            lineHeight * (i + 1) + getInsets.top,
+          )

@@ -1,4 +1,4 @@
-package presentation.menu
+package presentation.menu.edit
 
 import presentation.ui.utils.{ctrlKey, ctrlShiftKey}
 
