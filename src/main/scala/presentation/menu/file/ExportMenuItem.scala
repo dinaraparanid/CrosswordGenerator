@@ -1,49 +1,42 @@
 package presentation.menu.file
 
-import data.app.{SessionStates, resetDocPath}
-import presentation.{pageChannel, sessionDocStream, sessionStates}
+import data.app.SessionBroadcast
+import data.storage.{StoragePreferences, sessionDocPathStream, storeSessionDocPath}
+import presentation.sessionBroadcast
 import presentation.ui.utils.ctrlShiftKey
 
-import zio.channel.Channel
-import zio.{RIO, Runtime, URIO, Unsafe, ZIO}
+import zio.{RIO, Runtime, Scope, URIO, Unsafe, ZIO}
 
-import java.io.File
 import java.awt.event.KeyEvent
+import java.io.File
+import java.nio.file.Files
 import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.{JFileChooser, JMenuItem}
 
-private def ExportMenuItem(): URIO[SessionStates, JMenuItem] =
+private def ExportMenuItem(): URIO[StoragePreferences & SessionBroadcast & Scope, JMenuItem] =
   val menuItem = new JMenuItem("Export"):
     setAccelerator(ctrlShiftKey(KeyEvent.VK_S))
 
-  val runtime = Runtime.default
-
   def recompose(
-    sessionStates: SessionStates,
-    pageChan:      Channel[Boolean],
-    docPath:       String,
+    runtime: Runtime[StoragePreferences & SessionBroadcast],
+    docPath: String
   ): Unit =
     menuItem addActionListener: _ ⇒
       Unsafe.unsafe:
         implicit unsafe ⇒
           runtime.unsafe.runToFuture:
-            FileSaveDialog(sessionStates, pageChan, docPath)
+            FileSaveDialog(docPath)
 
   for
-    session  ← sessionStates()
-    pageChan ← pageChannel()
-    doc      ← sessionDocStream()
-    _        ← doc
+    runtime ← (StoragePreferences.layer ++ SessionBroadcast.layer).toRuntime
+    doc     ← sessionDocPathStream
+    _       ← doc
       .foreach:
-        ZIO attempt recompose(session, pageChan, _)
+        ZIO attempt recompose(runtime, _)
       .fork
   yield menuItem
 
-private def FileSaveDialog(
-  sessionStates:  SessionStates,
-  pageChan:       Channel[Boolean],
-  sessionDocPath: String,
-): RIO[Any, Option[Unit]] =
+private def FileSaveDialog(sessionDocPath: String): RIO[StoragePreferences & SessionBroadcast, Option[Unit]] =
   val fileChooser = new JFileChooser:
     setFileFilter(FileNameExtensionFilter(null, "pdf"))
 
@@ -51,13 +44,11 @@ private def FileSaveDialog(
 
   ZIO.when(response == JFileChooser.APPROVE_OPTION):
     val storeFile = fileChooser.getSelectedFile.toPdf
-    val storePath = storeFile.getAbsolutePath
-    File(sessionDocPath) renameTo storeFile
+    Files.copy(File(sessionDocPath).toPath, storeFile.toPath)
 
     for
-      _ ← sessionStates resetDocPath storePath
-      _ ← (pageChan send true) mapError:
-        err ⇒ Exception(err.toString)
+      session ← sessionBroadcast()
+      _       ← session.updatePage()
     yield ()
 
 extension (file: File)

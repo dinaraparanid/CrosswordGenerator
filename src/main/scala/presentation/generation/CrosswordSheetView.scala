@@ -1,17 +1,19 @@
 package presentation.generation
 
-import data.app.SessionStates
+import data.app.SessionBroadcast
+import data.storage.{StoragePreferences, sessionDoc}
 import domain.session.SessionDocumentWriter
-import presentation.{pageChannel, sessionDoc}
+import presentation.updatePageChannel
 
 import org.icepdf.ri.common.{SwingController, SwingViewBuilder}
 
 import zio.channel.foreverWhile
 import zio.{RIO, ZIO}
 
+import java.io.File
 import javax.swing.JSplitPane
 
-def CrosswordSheetView(): RIO[SessionStates, JSplitPane] =
+def CrosswordSheetView(): RIO[StoragePreferences & SessionBroadcast, JSplitPane] =
   def documentController(doc: String): SwingController =
     new SwingController:
       openDocument(doc)
@@ -27,18 +29,19 @@ def CrosswordSheetView(): RIO[SessionStates, JSplitPane] =
     _          ← monitorPageChanges(controller).fork
   yield view
 
-private def initialDoc(): RIO[SessionStates, String] =
+private def initialDoc(): RIO[StoragePreferences, String] =
   for
-    doc ← sessionDoc()
-    _   ← ZIO attempt SessionDocumentWriter(doc).close()
+    doc ← sessionDoc
+    _   ← ZIO.when(!File(doc).exists()):
+      ZIO attempt SessionDocumentWriter(doc).close()
   yield doc
 
-private def monitorPageChanges(controller: SwingController): RIO[SessionStates, Unit] =
+private def monitorPageChanges(controller: SwingController): RIO[StoragePreferences & SessionBroadcast, Unit] =
   foreverWhile:
     for
-      pageChan ← pageChannel()
+      pageChan ← updatePageChannel()
       data     ← pageChan.receive mapError (err ⇒ Exception(err.toString))
-      doc      ← sessionDoc()
+      doc      ← sessionDoc
       _        ← ZIO attempt revalidateCrosswordPage(controller, doc, data)
     yield data
 

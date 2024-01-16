@@ -1,18 +1,20 @@
 package presentation.menu
 
-import data.app.{AppConfig, SessionStates}
+import data.FullEnvironment
+import data.app.{AppBroadcast, SessionBroadcast}
 import data.app.navigation.NavigationService
+import data.storage.StoragePreferences
 
 import presentation.menu.edit.EditMenu
 import presentation.menu.file.FileMenu
 import presentation.menu.help.HelpMenu
 import presentation.menu.view.ViewMenu
 
-import zio.{RIO, ZIO}
+import zio.{RIO, Scope, ZIO}
 
 import javax.swing.{JMenu, JMenuBar}
 
-def MainMenuBar(): RIO[AppConfig & NavigationService & SessionStates, JMenuBar] =
+def MainMenuBar(): RIO[FullEnvironment & Scope, JMenuBar] =
   val menu = JMenuBar()
 
   def setContentOfMenu(

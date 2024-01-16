@@ -1,14 +1,15 @@
 package presentation.generation.input
 
-import data.app.{AppConfig, SessionStates}
+import data.app.SessionBroadcast
+import data.storage.StoragePreferences
 import presentation.ui.utils.{VerticalSpacer, gbc}
 
-import zio.{RIO, ZIO}
+import zio.{RIO, Scope, ZIO}
 
 import java.awt.{GridBagConstraints, GridBagLayout}
 import javax.swing.*
 
-def InputPanel(): RIO[AppConfig & SessionStates, JPanel] =
+def InputPanel(): RIO[StoragePreferences & SessionBroadcast & Scope, JPanel] =
   val gbLayout = GridBagLayout()
 
   val panel = new JPanel:

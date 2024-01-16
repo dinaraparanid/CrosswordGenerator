@@ -1,20 +1,24 @@
-import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMaterialPalenightIJTheme
-
+import data.FullEnvironment
 import data.app.navigation.NavigationService
-import data.app.{AppConfig, SessionStates}
+import data.app.{AppBroadcast, SessionBroadcast}
+import data.storage.{StoragePreferences, monitorDataChanges, setupTheme}
 import presentation.MainFrame
 
-import zio.{Promise, RIO, UIO, ULayer, ZIO, ZIOAppDefault}
+import zio.{Promise, RIO, Scope, UIO, ULayer, ZIO, ZIOAppDefault}
 
 import java.awt.{Font, GraphicsEnvironment}
 import java.io.File
 import javax.swing.JFrame
 
 object Application extends ZIOAppDefault:
-  private val appLayer: ULayer[AppConfig & NavigationService & SessionStates] =
-    AppConfig.layer ++ NavigationService.layer ++ SessionStates.layer
+  private val appLayer: ULayer[FullEnvironment & Scope] =
+    StoragePreferences.layer ++
+    AppBroadcast.layer       ++
+    SessionBroadcast.layer   ++
+    NavigationService.layer  ++
+    Scope.default
 
-  private val appLogic: RIO[AppConfig & NavigationService & SessionStates, Unit] =
+  private val appLogic: RIO[FullEnvironment & Scope, Unit] =
     setup()
 
     for
@@ -25,9 +29,11 @@ object Application extends ZIOAppDefault:
   override def run: RIO[Any, Unit] =
     appLogic provideLayer appLayer
 
-  private def runApplication(): RIO[AppConfig & NavigationService & SessionStates, JFrame] =
+  private def runApplication(): RIO[FullEnvironment & Scope, JFrame] =
     for
+      _     ← setupTheme()
       frame ← MainFrame()
+      _     ← monitorDataChanges().fork
       _     ← ZIO attempt (frame setVisible true)
     yield frame
 
@@ -38,11 +44,9 @@ object Application extends ZIOAppDefault:
     yield ()
 
 private def setup(): Unit =
-  FlatMaterialPalenightIJTheme.setup()
-  System.err.close()
-
   val ge = GraphicsEnvironment.getLocalGraphicsEnvironment
   ge registerFont "./res/pristina.ttf"
+  System.err.close()
 
 extension (ge: GraphicsEnvironment)
   private def registerFont(path: String) =

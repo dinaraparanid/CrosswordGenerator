@@ -1,29 +1,33 @@
 package presentation.generation.input
 
-import data.app.{AppConfig, SessionStates, resetTitle}
-import presentation.sessionStates
+import data.storage.{StoragePreferences, storeTitleInput, titleInput}
 import presentation.ui.utils.PlaceholderTextComponent
 
-import zio.{RIO, Runtime, Unsafe, ZIO}
+import zio.{RIO, Runtime, Scope, Unsafe, ZIO}
 
 import javax.swing.JTextField
 
 private val TitlePlaceholder = "Crossword title"
 
-def TitleInput(): RIO[AppConfig & SessionStates, JTextField] =
+def TitleInput(): RIO[StoragePreferences & Scope, JTextField] =
   val input = initialInputField
-  val runtime = Runtime.default
+  val rt = Runtime.default
 
-  def setCaretListener(inputStates: SessionStates): Unit =
+  def impl(
+    initialText: String,
+    runtime:     Runtime[StoragePreferences]
+  ): Unit =
+    input setText initialText
     input addCaretListener: _ ⇒
       Unsafe unsafe:
         implicit unsafe ⇒
-          runtime.unsafe.runToFuture: 
-            inputStates resetTitle input.getText
+          runtime.unsafe.runToFuture:
+            storeTitleInput(input.getText)
 
   for
-    inputs ← sessionStates()
-    _      ← ZIO attempt setCaretListener(inputs)
+    title   ← titleInput
+    runtime ← StoragePreferences.layer.toRuntime
+    _       ← ZIO attempt impl(title, runtime)
   yield input
 
 private def initialInputField: JTextField =

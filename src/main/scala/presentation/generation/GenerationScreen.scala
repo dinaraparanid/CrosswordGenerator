@@ -1,15 +1,15 @@
 package presentation.generation
 
-import data.app.{AppConfig, SessionStates}
+import data.app.{AppBroadcast, SessionBroadcast}
+import data.storage.StoragePreferences
 import presentation.generation.input.InputPanel
 import presentation.ui.utils.{HorizontalSpacer, VerticalSpacer, gbc}
-
-import zio.{RIO, ZIO}
+import zio.{RIO, Scope, ZIO}
 
 import java.awt.{GridBagConstraints, GridBagLayout}
 import javax.swing.{JPanel, JSplitPane}
 
-def GenerationScreen(): RIO[AppConfig & SessionStates, JPanel] =
+def GenerationScreen(): RIO[StoragePreferences & SessionBroadcast & Scope, JPanel] =
   val panel = new JPanel:
     setLayout(GridBagLayout())
 

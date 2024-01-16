@@ -1,48 +1,41 @@
 package presentation.generation.input
 
-import data.app.{AppConfig, SessionStates, resetWords}
-import presentation.sessionStates
+import data.storage.{StoragePreferences, storeWordsInput, wordsInput}
 import presentation.ui.utils.PlaceholderTextComponent
 
-import zio.{RIO, Runtime, Unsafe, ZIO}
+import zio.{RIO, Runtime, Scope, Unsafe, ZIO}
 
 import java.awt.BorderLayout
 import javax.swing.{JPanel, JScrollPane, JTextArea, ScrollPaneConstants}
 
 private val WordsPlaceholder = "Type or paste your words here"
 
-private val WordsInitialText =
-  """Type or paste your words here
-    |
-    |Example:
-    |Chieftain - the leader of the Cossacks.
-    |Minotaur - Cretan monster with the body of a man and the head of a bull, who lived in a Labyrinth and was killed by Theseus.
-    |Scimitar - bladed stabbing and slashing edged weapon with a long single-edged blade having a double bend; something between a saber and a cleaver.""".stripMargin
-
-def WordsInput(): RIO[AppConfig & SessionStates, JPanel] =
+def WordsInput(): RIO[StoragePreferences & Scope, JPanel] =
   val input = initialInputArea
 
   val panel = new JPanel(BorderLayout()):
     add(inputScroll(input), BorderLayout.CENTER)
 
-  val runtime = Runtime.default
-
-  def setCaretListener(inputStates: SessionStates): Unit =
+  def impl(
+    initialWords: String,
+    runtime:      Runtime[StoragePreferences]
+  ): Unit =
+    input setText initialWords
     input addCaretListener: _ ⇒
       Unsafe unsafe:
         implicit unsafe ⇒
-          runtime.unsafe.runToFuture: 
-            inputStates resetWords input.getText
+          runtime.unsafe.runToFuture:
+            storeWordsInput(input.getText)
 
   for
-    inputs ← sessionStates()
-    _      ← ZIO attempt setCaretListener(inputs)
+    words   ← wordsInput
+    runtime ← StoragePreferences.layer.toRuntime
+    _       ← ZIO attempt impl(words, runtime)
   yield panel
 
 private def initialInputArea: JTextArea =
   new JTextArea
     with PlaceholderTextComponent:
-    setText(WordsInitialText)
     setPlaceholder(WordsPlaceholder)
     setWrapStyleWord(true)
     setLineWrap(true)

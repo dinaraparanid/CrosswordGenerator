@@ -3,16 +3,17 @@ package presentation.generation.input
 import com.itextpdf.layout.element.AreaBreak
 import com.itextpdf.layout.properties.AreaBreakType
 
-import data.app.{SessionStates, isInputCorrectStream}
+import data.app.SessionBroadcast
 import data.generation.population.TableState
+import data.storage.*
 
 import domain.generation.generation
 import domain.session.packing.packed
 import domain.session.{SessionDocumentWriter, parsedWordsWithMeanings}
 
 import presentation.generation.pdf.*
-import presentation.sessionStates
 import presentation.ui.utils.{combine, removeActionListeners}
+import presentation.updatePageChannel
 
 import zio.channel.Channel
 import zio.{RIO, Runtime, UIO, URIO, Unsafe, ZIO}
@@ -21,7 +22,7 @@ import javax.swing.JButton
 
 import scala.util.Using
 
-def GenerateButton(): URIO[SessionStates, JButton] =
+def GenerateButton(): URIO[StoragePreferences & SessionBroadcast, JButton] =
   val button = new JButton("Generate"):
     putClientProperty("JButton.buttonType", "roundRect")
 
@@ -54,18 +55,17 @@ def GenerateButton(): URIO[SessionStates, JButton] =
             yield ()
 
   for
-    session           ← sessionStates()
-    isCorrectStream   = session.isInputCorrectStream
-    titleInputStream  = session.titleInput.changes
-    wordsInputsStream = session.wordsInput.changes
-    sessionDocStream  = session.sessionDoc.changes
-    pageChan          = session.pageChan
+    isCorrectStream ← isInputCorrectStream
+    titleStream     ← titleInputStream
+    wordsStream     ← wordsInputStream
+    docStream       ← sessionDocPathStream
+    pageChan        ← updatePageChannel()
 
     _ ← combine(
       isCorrectStream,
-      titleInputStream,
-      wordsInputsStream,
-      sessionDocStream
+      titleStream,
+      wordsStream,
+      docStream
     )
       .foreach:
         case (correct, title, words, doc) ⇒
@@ -109,5 +109,4 @@ private def showCrossword(
     doc add HeaderParagraph("Answers")
     doc add (AnswerTable(tableState) setMarginTop 25)
 
-  (pageChan send true) mapError:
-    err ⇒ Exception(err.toString)
+  (pageChan send true).toRIO

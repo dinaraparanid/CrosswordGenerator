@@ -1,16 +1,16 @@
 package presentation.menu.view
 
-import data.app.AppConfig
+import data.app.AppBroadcast
 import data.app.navigation.NavigationService
 import presentation.ui.utils.ctrlKey
-import presentation.{appConfig, navigator}
+import presentation.{appBroadcast, navigator}
 
 import zio.{RIO, URIO, ZIO}
 
 import java.awt.event.KeyEvent
 import javax.swing.{JMenu, JMenuItem}
 
-def ViewMenu(): RIO[AppConfig & NavigationService, JMenu] =
+def ViewMenu(): RIO[AppBroadcast & NavigationService, JMenu] =
   val menu = JMenu("View")
 
   def setContentOfMenu(appearanceItem: JMenuItem): Unit =
@@ -23,14 +23,12 @@ def ViewMenu(): RIO[AppConfig & NavigationService, JMenu] =
       setContentOfMenu(appearanceItem)
   yield menu
 
-private def ThemeMenuItem(): URIO[AppConfig & NavigationService, JMenuItem] =
-  for
-    conf ← appConfig()
-    nav  ← navigator()
-  yield new JMenuItem("Theme"):
-    setAccelerator(ctrlKey(KeyEvent.VK_U))
-    addActionListener: _ ⇒
-      nav foreach { n ⇒ conf.resetTheme(n.frame) }
+private def ThemeMenuItem(): URIO[AppBroadcast & NavigationService, JMenuItem] =
+  for app ← appBroadcast() 
+    yield new JMenuItem("Theme"):
+      setAccelerator(ctrlKey(KeyEvent.VK_U))
+      addActionListener: _ ⇒
+        app.resetTheme()
 
 private def FontMenuItem(): JMenuItem =
   new JMenuItem("Font"):

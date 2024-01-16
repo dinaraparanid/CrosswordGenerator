@@ -1,14 +1,15 @@
 package presentation.menu.file
 
-import data.app.SessionStates
+import data.app.SessionBroadcast
+import data.storage.StoragePreferences
 import presentation.ui.utils.{ctrlKey, ctrlShiftKey}
 
-import zio.{RIO, ZIO}
+import zio.{RIO, Scope, ZIO}
 
 import java.awt.event.KeyEvent
 import javax.swing.{JMenu, JMenuItem, JSeparator}
 
-def FileMenu(): RIO[SessionStates, JMenu] =
+def FileMenu(): RIO[StoragePreferences & SessionBroadcast & Scope, JMenu] =
   val menu = JMenu("File")
 
   def setContent(exportMenuItem: JMenuItem): Unit =
