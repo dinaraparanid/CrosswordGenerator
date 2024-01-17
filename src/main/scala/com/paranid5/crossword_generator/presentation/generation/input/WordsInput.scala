@@ -1,9 +1,10 @@
 package com.paranid5.crossword_generator.presentation.generation.input
 
 import com.paranid5.crossword_generator.data.storage.*
-import com.paranid5.crossword_generator.presentation.ui.utils.PlaceholderTextComponent
+import com.paranid5.crossword_generator.presentation.ui.utils.{PlaceholderTextComponent, removeCaretListeners}
 
 import zio.channel.Channel
+import zio.stm.TReentrantLock
 import zio.{RIO, Runtime, Unsafe, ZIO}
 
 import java.awt.BorderLayout
@@ -34,12 +35,17 @@ def WordsInput(): RIO[StoragePreferences, JPanel] =
     input setText initialWords
 
   @inline
-  def recompose(updateChan: Channel[Boolean], elem: Elem): Unit =
+  def recompose(
+    updateChan:  Channel[Boolean],
+    storageLock: TReentrantLock,
+    elem:        Elem
+  ): Unit =
+    input.removeCaretListeners()
     input addCaretListener: _ ⇒
       Unsafe unsafe:
         implicit unsafe ⇒
           runtime.unsafe.runToFuture:
-            storeWordsInput(elem, updateChan, input.getText)
+            storeWordsInput(elem, updateChan, storageLock, input.getText)
 
   for
     words ← wordsInput
@@ -47,9 +53,10 @@ def WordsInput(): RIO[StoragePreferences, JPanel] =
 
     elems ← dataStream
     chan  ← updateChannel()
+    lock  ← storageLock
     _     ← elems
       .foreach:
-        ZIO attempt recompose(chan, _)
+        ZIO attempt recompose(chan, lock, _)
       .fork
   yield panel
 

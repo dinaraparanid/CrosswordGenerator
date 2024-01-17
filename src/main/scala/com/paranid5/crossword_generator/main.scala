@@ -69,7 +69,7 @@ private def installFonts(): Unit =
 /** Closes output streams */
 
 private def closeStreams(): Unit =
-  System.out.close()
+  //System.out.close()
   System.err.close()
 
 extension (ge: GraphicsEnvironment)

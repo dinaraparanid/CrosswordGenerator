@@ -1,10 +1,10 @@
 package com.paranid5.crossword_generator.presentation.generation.input
 
-import com.paranid5.crossword_generator.data.storage.{dataStream, updateChannel}
-import com.paranid5.crossword_generator.data.storage.{StoragePreferences, storeTitleInput, titleInput}
-import com.paranid5.crossword_generator.presentation.ui.utils.PlaceholderTextComponent
+import com.paranid5.crossword_generator.data.storage.{StoragePreferences, dataStream, storageLock, storeTitleInput, titleInput, updateChannel}
+import com.paranid5.crossword_generator.presentation.ui.utils.{PlaceholderTextComponent, removeCaretListeners}
 
 import zio.channel.Channel
+import zio.stm.TReentrantLock
 import zio.{RIO, Runtime, Unsafe, ZIO}
 
 import javax.swing.JTextField
@@ -28,12 +28,17 @@ def TitleInput(): RIO[StoragePreferences, JTextField] =
     input setText initialText
 
   @inline
-  def recompose(updateChan: Channel[Boolean], elem: Elem): Unit =
+  def recompose(
+    updateChan:  Channel[Boolean],
+    storageLock: TReentrantLock,
+    elem:        Elem,
+  ): Unit =
+    input.removeCaretListeners()
     input addCaretListener: _ ⇒
       Unsafe unsafe:
         implicit unsafe ⇒
           runtime.unsafe.runToFuture:
-            storeTitleInput(elem, updateChan, input.getText)
+            storeTitleInput(elem, updateChan, storageLock, input.getText)
 
   for
     title ← titleInput
@@ -41,9 +46,10 @@ def TitleInput(): RIO[StoragePreferences, JTextField] =
 
     elems ← dataStream
     chan  ← updateChannel()
+    lock  ← storageLock
     _     ← elems
       .foreach:
-        ZIO attempt recompose(chan, _)
+        ZIO attempt recompose(chan, lock, _)
       .fork
   yield input
 

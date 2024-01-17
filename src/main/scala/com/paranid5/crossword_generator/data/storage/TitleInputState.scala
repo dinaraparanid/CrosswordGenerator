@@ -1,6 +1,7 @@
 package com.paranid5.crossword_generator.data.storage
 
 import zio.channel.Channel
+import zio.stm.TReentrantLock
 import zio.{RIO, URIO, ZIO}
 import zio.stream.UStream
 
@@ -33,21 +34,25 @@ def titleInput: URIO[StoragePreferences, String] =
  */
 
 def storeTitleInput(
-  elem:       Elem,
-  updateChan: Channel[Boolean],
-  titleInput: String
+  elem:        Elem,
+  updateChan:  Channel[Boolean],
+  storageLock: TReentrantLock,
+  titleInput:  String,
 ): RIO[Any, Unit] =
-  for
-    _ ← ZIO attemptBlocking
-      XML.save(
-        filename = StoragePath,
-        node = updatedTitle(elem, titleInput),
-        enc = "UTF-8",
-        xmlDecl = true
-      )
+  ZIO scoped:
+    for
+      _ ← storageLock.writeLock
+      
+      _ ← ZIO attemptBlocking
+        XML.save(
+          filename = StoragePath,
+          node = updatedTitle(elem, titleInput),
+          enc = "UTF-8",
+          xmlDecl = true
+        )
 
-    _ ← notifyDataUpdate(updateChan)
-  yield ()
+      _ ← notifyDataUpdate(updateChan)
+    yield ()
 
 /**
  * Updates the title value in the XML data

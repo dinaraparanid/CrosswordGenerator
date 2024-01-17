@@ -73,19 +73,23 @@ private def setupLaf: String ⇒ Boolean =
  */
 
 def storeAppTheme(theme: String): RIO[StoragePreferences, Unit] =
-  for
-    elem ← data
+  ZIO scoped:
+    for
+      lock ← storageLock
+      _    ← lock.writeLock
 
-    _ ← ZIO attemptBlocking
-      XML.save(
-        filename = StoragePath,
-        node = updatedTheme(elem, theme),
-        enc = "UTF-8",
-        xmlDecl = true
-      )
+      elem ← data
 
-    _ ← notifyDataUpdate()
-  yield ()
+      _ ← ZIO attemptBlocking
+        XML.save(
+          filename = StoragePath,
+          node = updatedTheme(elem, theme),
+          enc = "UTF-8",
+          xmlDecl = true
+        )
+
+      _ ← notifyDataUpdate()
+    yield ()
 
 /**
  * Checks if the specified theme

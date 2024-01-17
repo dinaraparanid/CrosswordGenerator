@@ -20,13 +20,13 @@ def ViewMenu(): RIO[AppConfigChannel & NavigationService, JMenu] =
   val menu = JMenu("View")
 
   @inline
-  def impl(appearanceItem: JMenuItem): Unit =
-    menu add appearanceItem
+  def impl(themeItem: JMenuItem): Unit =
+    menu add themeItem
     menu add FontMenuItem()
 
   for
-    appearanceItem ← ThemeMenuItem()
-    _              ← ZIO attempt impl(appearanceItem)
+    themeItem ← ThemeMenuItem()
+    _         ← ZIO attempt impl(themeItem)
   yield menu
 
 /**

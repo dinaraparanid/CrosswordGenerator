@@ -41,7 +41,7 @@ final class AppConfigChannel(
         call  ← resetThemeChan.receive.toRIO
         theme ← appTheme
 
-        _ ← storeAppTheme(switchTheme(theme))
+        _ ← storeAppTheme(switchTheme(theme)).fork
         _ ← ZIO attempt (SwingUtilities updateComponentTreeUI frame)
       yield call
 

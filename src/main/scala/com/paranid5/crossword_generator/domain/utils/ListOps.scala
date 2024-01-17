@@ -10,6 +10,6 @@ extension[T] (list: List[T])
    */
 
   def tailOrNil: List[T] =
-    list.tail match
+    list match
       case Nil       ⇒ Nil
       case _ :: next ⇒ next

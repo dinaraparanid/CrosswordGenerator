@@ -2,27 +2,30 @@ package com.paranid5.crossword_generator.data.storage
 
 import com.paranid5.crossword_generator.data.utils.toRIO
 
-import zio.channel.{Channel, ChannelStatus, foreverWhile}
+import zio.channel.{Channel, foreverWhile}
+import zio.stm.TReentrantLock
 import zio.stream.{SubscriptionRef, UStream}
 import zio.{RIO, ULayer, URIO, ZIO, ZLayer}
 
 import java.io.{File, PrintWriter}
 
-import scala.xml.{Elem, Node, XML}
 import scala.util.Using
+import scala.xml.{Elem, Node, XML}
 
 private val StoragePath = "preferences.xml"
 
 /**
  * Accesses and manages the app's XML storage states
  *
- * @param dataRef    reference to current XML app config
- * @param updateChan channel to broadcast XML app config changes
+ * @param dataRef     reference to current XML app config
+ * @param updateChan  channel to broadcast XML app config changes
+ * @param storageLock RW Lock of the storage access
  */
 
 case class StoragePreferences(
-  dataRef:    SubscriptionRef[Elem],
-  updateChan: Channel[Boolean],
+  dataRef:     SubscriptionRef[Elem],
+  updateChan:  Channel[Boolean],
+  storageLock: TReentrantLock
 )
 
 /** Provides a layer for the [[StoragePreferences]] */
@@ -38,7 +41,8 @@ object StoragePreferences:
       for
         dataRef    ← SubscriptionRef make loadStorageFile()
         updateChan ← Channel.make[Boolean]
-      yield StoragePreferences(dataRef, updateChan)
+        lock       ← TReentrantLock.make.commit
+      yield StoragePreferences(dataRef, updateChan, lock)
 
 /**
  * Provides [[StoragePreferences]] from the ZIO environment
@@ -79,14 +83,30 @@ def data: URIO[StoragePreferences, Elem] =
   yield elem
 
 /**
+ * Acquires RW Lock of the storage access
+ * @return [[URIO]] with [[TReentrantLock]]
+ */
+
+def storageLock: URIO[StoragePreferences, TReentrantLock] =
+  for pref ← storagePreferences
+    yield pref.storageLock
+
+/**
  * Updates the XML data by reloading it from the file
  * @return [[URIO]] that completes when state is updated
  */
 
-private def updateData(): URIO[StoragePreferences, Unit] =
+private def updateData(): RIO[StoragePreferences, Unit] =
   for
-    ref ← dataRef
-    _   ← ref set loadStorageFile()
+    lock ← storageLock
+    _ ← ZIO
+      .scoped:
+        for
+          _       ← lock.readLock
+          ref     ← dataRef
+          updated ← ZIO attemptBlocking loadStorageFile()
+          _       ← ref set updated
+        yield ()
   yield ()
 
 /**
@@ -111,10 +131,9 @@ def monitorDataChanges(): RIO[StoragePreferences, Unit] =
   foreverWhile:
     for
       chan ← updateChannel()
-      data ← chan.receive
-      _    ← updateData()
+      data ← chan.receive.toRIO
+      _    ← updateData().fork
     yield data
-  .toRIO
 
 /**
  * Sends a broadcast to listeners
@@ -141,7 +160,7 @@ def notifyDataUpdate(): RIO[StoragePreferences, Unit] =
  */
 
 def notifyDataUpdate(chan: Channel[Boolean]): RIO[Any, Unit] =
-  for _ ← (chan send true).toRIO yield ()
+  (chan send true).toRIO
 
 /**
  * Provides a ZIO stream of the XML parsed value
@@ -202,7 +221,9 @@ private def stringData(
 private def loadStorageFile(): Elem =
   val file = File(StoragePath)
 
-  if file.createNewFile() then
+  if !file.exists() then
+    file.createNewFile()
+
     Using(PrintWriter(file)):
       _ println
       """<data>
