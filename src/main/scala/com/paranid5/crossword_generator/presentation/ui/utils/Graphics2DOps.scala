@@ -3,6 +3,11 @@ package com.paranid5.crossword_generator.presentation.ui.utils
 import java.awt.{Graphics2D, RenderingHints}
 
 extension (g2d: Graphics2D)
+  /**
+   * Applies all possible quality
+   * rendering hints for [[Graphics2D]]
+   */
+
   def setQualityRenderingHints(): Unit =
     g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY)
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)

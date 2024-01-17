@@ -2,11 +2,29 @@ package com.paranid5.crossword_generator.presentation.ui.utils
 
 import zio.stream.ZStream
 
+/**
+ * Combines 2 ZIO streams into the single one.
+ * When a value is emitted by either of the two streams,
+ * it is combined with the latest value from
+ * the other stream to produce a result
+ *
+ * @return combined stream from all given streams
+ */
+
 def combine[R1, R2, E1, E2, A1, A2](
   p1: ZStream[R1, E1, A1],
   p2: ZStream[R2, E2, A2]
 ): ZStream[R1 & R2, E1 | E2, (A1, A2)] =
   p1 zipLatest p2
+
+/**
+ * Combines 3 ZIO streams into the single one.
+ * When a value is emitted by either of the two streams,
+ * it is combined with the latest value from
+ * the other stream to produce a result
+ *
+ * @return combined stream from all given streams
+ */
 
 def combine[R1, R2, R3, E1, E2, E3, A1, A2, A3](
   p1: ZStream[R1, E1, A1],
@@ -15,6 +33,15 @@ def combine[R1, R2, R3, E1, E2, E3, A1, A2, A3](
 ): ZStream[R1 & R2 & R3, E1 | E2 | E3, (A1, A2, A3)] =
   combine(p1, p2).zipLatestWith(p3):
     case ((a1, a2), a3) ⇒ (a1, a2, a3)
+
+/**
+ * Combines 4 ZIO streams into the single one.
+ * When a value is emitted by either of the two streams,
+ * it is combined with the latest value from
+ * the other stream to produce a result
+ *
+ * @return combined stream from all given streams
+ */
 
 def combine[R1, R2, R3, R4, E1, E2, E3, E4, A1, A2, A3, A4](
   p1: ZStream[R1, E1, A1],
@@ -28,6 +55,15 @@ def combine[R1, R2, R3, R4, E1, E2, E3, E4, A1, A2, A3, A4](
 ] = combine(p1, p2, p3).zipLatestWith(p4):
   case ((a1, a2, a3), a4) ⇒
     (a1, a2, a3, a4)
+
+/**
+ * Combines 5 ZIO streams into the single one.
+ * When a value is emitted by either of the two streams,
+ * it is combined with the latest value from
+ * the other stream to produce a result
+ *
+ * @return combined stream from all given streams
+ */
 
 def combine[
   R1, R2, R3, R4, R5,
@@ -46,6 +82,15 @@ def combine[
 ] = combine(p1, p2, p3, p4).zipLatestWith(p5):
   case ((a1, a2, a3, a4), a5) ⇒
     (a1, a2, a3, a4, a5)
+
+/**
+ * Combines 6 ZIO streams into the single one.
+ * When a value is emitted by either of the two streams,
+ * it is combined with the latest value from
+ * the other stream to produce a result
+ *
+ * @return combined stream from all given streams
+ */
 
 def combine[
   R1, R2, R3, R4, R5, R6,
@@ -66,6 +111,15 @@ def combine[
   case ((a1, a2, a3, a4, a5), a6) ⇒
     (a1, a2, a3, a4, a5, a6)
 
+/**
+ * Combines 7 ZIO streams into the single one.
+ * When a value is emitted by either of the two streams,
+ * it is combined with the latest value from
+ * the other stream to produce a result
+ *
+ * @return combined stream from all given streams
+ */
+
 def combine[
   R1, R2, R3, R4, R5, R6, R7,
   E1, E2, E3, E4, E5, E6, E7,
@@ -85,6 +139,15 @@ def combine[
 ] = combine(p1, p2, p3, p4, p5, p6).zipLatestWith(p7):
   case ((a1, a2, a3, a4, a5, a6), a7) ⇒
     (a1, a2, a3, a4, a5, a6, a7)
+
+/**
+ * Combines 8 ZIO streams into the single one.
+ * When a value is emitted by either of the two streams,
+ * it is combined with the latest value from
+ * the other stream to produce a result
+ *
+ * @return combined stream from all given streams
+ */
 
 def combine[
   R1, R2, R3, R4, R5, R6, R7, R8,

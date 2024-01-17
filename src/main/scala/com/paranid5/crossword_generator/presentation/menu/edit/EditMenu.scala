@@ -5,6 +5,13 @@ import com.paranid5.crossword_generator.presentation.ui.utils.{ctrlKey, ctrlShif
 import java.awt.event.KeyEvent
 import javax.swing.{JMenu, JMenuItem, JSeparator}
 
+/**
+ * Edit menu to manipulate with input
+ * and the generated crossword
+ *
+ * @return the whole menu with all items
+ */
+
 def EditMenu(): JMenu =
   new JMenu("Edit"):
     add(UndoMenuItem())

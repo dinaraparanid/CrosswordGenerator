@@ -1,17 +1,25 @@
 package com.paranid5.crossword_generator.presentation.menu.file
 
-import com.paranid5.crossword_generator.data.app.SessionBroadcast
+import com.paranid5.crossword_generator.data.app.SessionChannel
 import com.paranid5.crossword_generator.data.storage.StoragePreferences
 import com.paranid5.crossword_generator.presentation.ui.utils.{ctrlKey, ctrlShiftKey}
 
-import zio.{RIO, Scope, ZIO}
+import zio.{RIO, ZIO}
 
 import java.awt.event.KeyEvent
 import javax.swing.{JMenu, JMenuItem, JSeparator}
 
-def FileMenu(): RIO[StoragePreferences & SessionBroadcast & Scope, JMenu] =
+/**
+ * File menu to manipulate with
+ * session configs and the document
+ *
+ * @return the whole menu with all items
+ */
+
+def FileMenu(): RIO[StoragePreferences & SessionChannel, JMenu] =
   val menu = JMenu("File")
 
+  @inline
   def setContent(exportMenuItem: JMenuItem): Unit =
     menu add NewMenuItem()
     menu add OpenMenuItem()

@@ -7,6 +7,18 @@ import zio.UIO
 
 import scala.annotation.tailrec
 
+/**
+ * Packs the given [[tableState]],
+ * removing padding from 4 sides,
+ * transforming the table state
+ * to the least possible squared table.
+ *
+ * @param tableState table state to pack
+ * @return packed table, where all words are
+ *         generally placed in the same way,
+ *         but padding is removed
+ */
+
 def packed(tableState: TableState): UIO[TableState] =
   for
     borders ← minTableSizePar(tableState.table)
@@ -16,6 +28,22 @@ def packed(tableState: TableState): UIO[TableState] =
     height    = bottom - top + 1
     tableSize = math.max(width, height)
   yield packed(tableState, tableSize, top, left)
+
+/**
+ * Packs the given [[tableState]],
+ * removing padding from 4 sides,
+ * transforming the table state
+ * to the least possible squared table.
+ *
+ * @param tableState table state to pack
+ * @param tableSize  reduced table size
+ * @param top        first row where content is not empty
+ * @param left       first column where content is not empty
+ * @return packed table, where all words are
+ *         generally placed in the same way,
+ *         but padding is removed
+ * @see [[minTableSizePar]]
+ */
 
 private def packed(
   tableState: TableState,
@@ -40,6 +68,15 @@ private def packed(
 
   putWords()
   TableState(table, words)
+
+/**
+ * Moves given [[wordStates]] to the up-left with the given offsets
+ *
+ * @param wordStates word states to move
+ * @param top        up offset (startRow -= top)
+ * @param left       left offset (startColumn -= left)
+ * @return list with moved word states
+ */
 
 private def packedWordStates(
   wordStates: List[WordState],

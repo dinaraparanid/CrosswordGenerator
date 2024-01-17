@@ -2,25 +2,27 @@ package com.paranid5.crossword_generator
 
 import com.paranid5.crossword_generator.data.FullEnvironment
 import com.paranid5.crossword_generator.data.app.navigation.NavigationService
-import com.paranid5.crossword_generator.data.app.{AppBroadcast, SessionBroadcast}
+import com.paranid5.crossword_generator.data.app.{AppConfigChannel, SessionChannel}
 import com.paranid5.crossword_generator.data.storage.{StoragePreferences, monitorDataChanges, setupTheme}
 import com.paranid5.crossword_generator.presentation.MainFrame
 
-import zio.{Promise, RIO, Scope, UIO, ULayer, ZIO, ZIOAppDefault}
+import zio.{Promise, RIO, UIO, ULayer, ZIO, ZIOAppDefault}
 
 import java.awt.{Font, GraphicsEnvironment}
 import java.io.File
-import javax.swing.JFrame
 
 object Application extends ZIOAppDefault:
-  private val appLayer: ULayer[FullEnvironment & Scope] =
-    StoragePreferences.layer ++
-    AppBroadcast.layer       ++
-    SessionBroadcast.layer   ++
-    NavigationService.layer  ++
-    Scope.default
+  /** Full layer with all services combined */
 
-  private val appLogic: RIO[FullEnvironment & Scope, Unit] =
+  private val appLayer: ULayer[FullEnvironment] =
+    StoragePreferences.layer ++
+    AppConfigChannel.layer       ++
+    SessionChannel.layer   ++
+    NavigationService.layer
+
+  /** Application event loop logic */
+
+  private val appLogic: RIO[FullEnvironment, Unit] =
     setup()
 
     for
@@ -31,13 +33,17 @@ object Application extends ZIOAppDefault:
   override def run: RIO[Any, Unit] =
     appLogic provideLayer appLayer
 
-  private def runApplication(): RIO[FullEnvironment & Scope, JFrame] =
+  /** Application event loop */
+
+  private def runApplication(): RIO[FullEnvironment, Unit] =
     for
       _     ← setupTheme()
       frame ← MainFrame()
       _     ← monitorDataChanges().fork
       _     ← ZIO attempt (frame setVisible true)
-    yield frame
+    yield ()
+
+  /** Eternal fibber to keep application shown */
 
   private def waitUntilClosed(): UIO[Unit] =
     for
@@ -45,13 +51,36 @@ object Application extends ZIOAppDefault:
       _           ← closeEffect.await
     yield ()
 
+/**
+ * Installs additional fonts
+ * and closes output streams
+ */
+
 private def setup(): Unit =
+  installFonts()
+  closeStreams()
+
+/** Installs additional fonts */
+
+private def installFonts(): Unit =
   val ge = GraphicsEnvironment.getLocalGraphicsEnvironment
   ge registerFont "./res/pristina.ttf"
+
+/** Closes output streams */
+
+private def closeStreams(): Unit =
+  System.out.close()
   System.err.close()
 
 extension (ge: GraphicsEnvironment)
-  private def registerFont(path: String) =
+  /**
+   * Registers font by its path
+   *
+   * @param path path to the .ttf font file
+   * @return true if font is registered
+   */
+
+  private def registerFont(path: String): Boolean =
     ge registerFont
       Font.createFont(
         Font.TRUETYPE_FONT,

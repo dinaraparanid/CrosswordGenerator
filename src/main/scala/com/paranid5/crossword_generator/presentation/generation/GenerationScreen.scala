@@ -1,19 +1,28 @@
 package com.paranid5.crossword_generator.presentation.generation
 
-import com.paranid5.crossword_generator.data.app.{AppBroadcast, SessionBroadcast}
+import com.paranid5.crossword_generator.data.app.SessionChannel
 import com.paranid5.crossword_generator.data.storage.StoragePreferences
 import com.paranid5.crossword_generator.presentation.generation.input.InputPanel
 import com.paranid5.crossword_generator.presentation.ui.utils.{HorizontalSpacer, VerticalSpacer, gbc}
-import zio.{RIO, Scope, ZIO}
+
+import zio.{RIO, ZIO}
 
 import java.awt.{GridBagConstraints, GridBagLayout}
 import javax.swing.{JPanel, JSplitPane}
 
-def GenerationScreen(): RIO[StoragePreferences & SessionBroadcast & Scope, JPanel] =
-  val panel = new JPanel:
-    setLayout(GridBagLayout())
+/**
+ * Composes generation screen from the
+ * input panel and the crossword pdf document itself
+ *
+ * @return [[RIO]] with [[JPanel]] of screen
+ *         that completes when the content is set
+ */
 
-  def setContentOfPanel(
+def GenerationScreen(): RIO[StoragePreferences & SessionChannel, JPanel] =
+  val panel = initialPanel
+
+  @inline
+  def impl(
     inputPanel:    JPanel,
     crosswordView: JSplitPane
   ): Unit =
@@ -26,8 +35,16 @@ def GenerationScreen(): RIO[StoragePreferences & SessionBroadcast & Scope, JPane
   for
     inputs    ← InputPanel()
     crossword ← CrosswordSheetView()
-    _         ← ZIO attempt setContentOfPanel(inputs, crossword)
+    _         ← ZIO attempt impl(inputs, crossword)
   yield panel
+
+/** Initial empty panel with [[GridBagLayout]] */
+
+private def initialPanel: JPanel =
+  new JPanel:
+    setLayout(GridBagLayout())
+
+// --------------------- Grid Bag Constraints ---------------------
 
 private def topSpacerGBC: GridBagConstraints =
   gbc(

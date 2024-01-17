@@ -1,21 +1,30 @@
 package com.paranid5.crossword_generator.presentation.generation.input
 
-import com.paranid5.crossword_generator.data.app.SessionBroadcast
+import com.paranid5.crossword_generator.data.app.SessionChannel
 import com.paranid5.crossword_generator.data.storage.StoragePreferences
 import com.paranid5.crossword_generator.presentation.ui.utils.{VerticalSpacer, gbc}
 
-import zio.{RIO, Scope, ZIO}
+import zio.{RIO, ZIO}
 
 import java.awt.{GridBagConstraints, GridBagLayout}
 import javax.swing.*
 
-def InputPanel(): RIO[StoragePreferences & SessionBroadcast & Scope, JPanel] =
+/**
+ * Defines a panel that contains input fields
+ * for the crossword title and words with meanings
+ *
+ * @return [[RIO]] with [[JPanel]] that completes
+ *         when all required content is set
+ */
+
+def InputPanel(): RIO[StoragePreferences & SessionChannel, JPanel] =
   val gbLayout = GridBagLayout()
 
   val panel = new JPanel:
     setLayout(gbLayout)
 
-  def setContentOfPanel(
+  @inline
+  def impl(
     titleInput:     JTextField,
     wordsInput:     JPanel,
     generateButton: JButton
@@ -36,15 +45,20 @@ def InputPanel(): RIO[StoragePreferences & SessionBroadcast & Scope, JPanel] =
     generateButton ← GenerateButton()
 
     _ ← ZIO attempt
-      setContentOfPanel(
+      impl(
         titleInput = titleInput,
         wordsInput = wordsInput,
         generateButton = generateButton
       )
   yield panel
 
-private def TitleLabel(): JLabel = JLabel("Title")
-private def WordsLabel(): JLabel = JLabel("Words")
+private def TitleLabel(): JLabel =
+  JLabel("Title")
+
+private def WordsLabel(): JLabel =
+  JLabel("Words")
+
+// ------------------ Grid Bag Constraints ------------------
 
 private def titleLabelGBC: GridBagConstraints =
   gbc(

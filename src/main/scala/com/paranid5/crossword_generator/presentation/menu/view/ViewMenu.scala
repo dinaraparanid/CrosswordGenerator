@@ -1,34 +1,59 @@
 package com.paranid5.crossword_generator.presentation.menu.view
 
-import com.paranid5.crossword_generator.data.app.AppBroadcast
+import com.paranid5.crossword_generator.data.app.AppConfigChannel
 import com.paranid5.crossword_generator.data.app.navigation.NavigationService
+import com.paranid5.crossword_generator.presentation.appConfigBroadcast
 import com.paranid5.crossword_generator.presentation.ui.utils.ctrlKey
-import com.paranid5.crossword_generator.presentation.{appBroadcast, navigator}
 
-import zio.{RIO, URIO, ZIO}
+import zio.{RIO, ZIO, Runtime, Unsafe}
 
 import java.awt.event.KeyEvent
 import javax.swing.{JMenu, JMenuItem}
 
-def ViewMenu(): RIO[AppBroadcast & NavigationService, JMenu] =
+/**
+ * View menu to manipulate with UI preferences
+ *
+ * @return the whole menu with all items
+ */
+
+def ViewMenu(): RIO[AppConfigChannel & NavigationService, JMenu] =
   val menu = JMenu("View")
 
-  def setContentOfMenu(appearanceItem: JMenuItem): Unit =
+  @inline
+  def impl(appearanceItem: JMenuItem): Unit =
     menu add appearanceItem
     menu add FontMenuItem()
 
   for
     appearanceItem ← ThemeMenuItem()
-    _              ← ZIO attempt
-      setContentOfMenu(appearanceItem)
+    _              ← ZIO attempt impl(appearanceItem)
   yield menu
 
-private def ThemeMenuItem(): URIO[AppBroadcast & NavigationService, JMenuItem] =
-  for app ← appBroadcast() 
-    yield new JMenuItem("Theme"):
-      setAccelerator(ctrlKey(KeyEvent.VK_U))
-      addActionListener: _ ⇒
-        app.resetTheme()
+/**
+ * Provides functionality to switch app themes
+ *
+ * @return [[JMenuItem]] with the ability to switch themes
+ * @see [[AppConfigChannel.resetTheme]]
+ */
+
+private def ThemeMenuItem(): RIO[AppConfigChannel & NavigationService, JMenuItem] =
+  val menuItem = new JMenuItem("Theme"):
+    setAccelerator(ctrlKey(KeyEvent.VK_U))
+
+  val runtime = Runtime.default
+
+  @inline
+  def impl(app: AppConfigChannel): Unit =
+    menuItem addActionListener: _ ⇒
+      Unsafe.unsafe:
+        implicit unsafe ⇒
+          runtime.unsafe.runToFuture:
+            app.resetTheme()
+
+  for
+    app ← appConfigBroadcast()
+    _   ← ZIO attempt impl(app)
+  yield menuItem
 
 private def FontMenuItem(): JMenuItem =
   new JMenuItem("Font"):

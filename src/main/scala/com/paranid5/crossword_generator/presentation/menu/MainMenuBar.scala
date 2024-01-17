@@ -1,23 +1,27 @@
 package com.paranid5.crossword_generator.presentation.menu
 
 import com.paranid5.crossword_generator.data.FullEnvironment
-import com.paranid5.crossword_generator.data.app.{AppBroadcast, SessionBroadcast}
-import com.paranid5.crossword_generator.data.app.navigation.NavigationService
-import com.paranid5.crossword_generator.data.storage.StoragePreferences
-
 import com.paranid5.crossword_generator.presentation.menu.edit.EditMenu
 import com.paranid5.crossword_generator.presentation.menu.file.FileMenu
 import com.paranid5.crossword_generator.presentation.menu.help.HelpMenu
 import com.paranid5.crossword_generator.presentation.menu.view.ViewMenu
 
-import zio.{RIO, Scope, ZIO}
+import zio.{RIO, ZIO}
 
 import javax.swing.{JMenu, JMenuBar}
 
-def MainMenuBar(): RIO[FullEnvironment & Scope, JMenuBar] =
+/**
+ * Application menu bar that consists of
+ * [[FileMenu]], [[EditMenu]], [[ViewMenu]] and [[HelpMenu]]
+ *
+ * @return [[JMenuBar]] with all menus placed
+ */
+
+def MainMenuBar(): RIO[FullEnvironment, JMenuBar] =
   val menu = JMenuBar()
 
-  def setContentOfMenu(
+  @inline
+  def impl(
     fileMenu: JMenu,
     viewMenu: JMenu
   ): Unit =
@@ -30,5 +34,5 @@ def MainMenuBar(): RIO[FullEnvironment & Scope, JMenuBar] =
     viewMenu ← ViewMenu()
     fileMenu ← FileMenu()
     _        ← ZIO attempt
-      setContentOfMenu(fileMenu, viewMenu)
+      impl(fileMenu, viewMenu)
   yield menu

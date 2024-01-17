@@ -11,19 +11,34 @@ import scala.annotation.tailrec
 
 private val DrainedCell = '*'
 
+/**
+ * Mapping between word starts
+ * and their corresponding layout and index
+ */
+
 private type WordsStarts = Map[(Int, Int), (Layout, Int)]
 
+/**
+ * Creates a PDF table representation of the crossword table
+ *
+ * @param tableState    generated crossword table
+ * @param textAlignment text alignment of the table cells
+ * @param fontSize      font size of the table cells
+ * @param letterCell    maps characters to their corresponding strings
+ *                      to display in the table cells
+ * @return The PDF table representation of the crossword puzzle
+ */
+
 private def CrosswordTable(
-  tableState: TableState,
+  tableState:    TableState,
   textAlignment: TextAlignment = TextAlignment.CENTER,
-  fontSize: Int = 12
+  fontSize:      Int = 12
 )(letterCell: Char ⇒ String): Table =
-  val pdfTable = Table(tableState.table.length)
-    .setBorder(Border.NO_BORDER)
-    .setHorizontalAlignment(HorizontalAlignment.CENTER)
-    .setTextAlignment(textAlignment)
-    .setFontSize(fontSize)
-    .setBold()
+  val pdfTable = initialPdfTable(
+    tableLength = tableState.table.length,
+    textAlignment = textAlignment,
+    fontSize = fontSize
+  )
 
   val TableState(tab, wordStates) = tableState
   val table                       = tab map (_.clone)
@@ -33,7 +48,7 @@ private def CrosswordTable(
     row  ← table.indices
     col  ← table.indices
     cell ← crosswordCell(row, col, table, wordsStarts)(letterCell)
-      .map(_ setMinWidth requiredSize setMinHeight requiredSize)
+      .map(_ setMinWidth requiredCellSize setMinHeight requiredCellSize)
   yield cell
 
   @tailrec
@@ -48,6 +63,38 @@ private def CrosswordTable(
 
   putCells()
 
+/**
+ * Composes an empty pdf squared table
+ *
+ * @param tableLength   required table size
+ * @param textAlignment letter alignment in the table's cells
+ * @param fontSize      letters' font size
+ * @return squared pdf [[Table]] with the given configuration
+ */
+
+@inline
+private def initialPdfTable(
+  tableLength:   Int,
+  textAlignment: TextAlignment = TextAlignment.CENTER,
+  fontSize:      Int = 12
+): Table =
+  Table(tableLength)
+    .setBorder(Border.NO_BORDER)
+    .setHorizontalAlignment(HorizontalAlignment.CENTER)
+    .setTextAlignment(textAlignment)
+    .setFontSize(fontSize)
+    .setBold()
+
+/**
+ * Extracts the mapping between word starts
+ * with their corresponding layout
+ * and index from the [[wordStates]] list
+ *
+ * @param wordStates The list of word states
+ * @return A [[WordsStarts]] map
+ */
+
+@inline
 private def enumeratedWordStarts(wordStates: List[WordState]): WordsStarts =
   wordStates
     .zipWithIndex
@@ -55,6 +102,18 @@ private def enumeratedWordStarts(wordStates: List[WordState]): WordsStarts =
       case (WordState(_, row, col, layout), ind) ⇒
         ((row, col), (layout, ind))
     .toMap
+
+/**
+ * Creates a [[Cell]] for a crossword table cell
+ * based on its row, column, table, words starts, and letter cell mapper
+ *
+ * @param row         row index of the cell
+ * @param column      column index of the cell
+ * @param table       crossword letter table
+ * @param wordsStarts [[WordsStarts]] map
+ * @param letterCell  mapper between cell's letter and the resulting string
+ * @return [[Cell]] or none if the position is already drained
+ */
 
 private def crosswordCell(
   row:         Int,
@@ -76,6 +135,17 @@ private def crosswordCell(
 
         case None ⇒
           Option(Cell() add Paragraph(letterCell(char)))
+
+/**
+ * Creates a fat [[Cell]] for a crossword table cell
+ * that drains rectangular space of max width with no letters
+ * based on its row, column, table, words starts, and letter cell mapper
+ *
+ * @param table       crossword letter table
+ * @param startRow    start row from which draining is started
+ * @param startColumn start column from which draining is started
+ * @return fat [[Cell]] that occupied maximum free space
+ */
 
 private def fatCell(
   table:       CrosswordTable,
@@ -118,5 +188,8 @@ private def fatCell(
 
   Cell(rows, columns) setBorder Border.NO_BORDER
 
-private def requiredSize: UnitValue =
+/** Minimum cell size */
+
+@inline
+private def requiredCellSize: UnitValue =
   UnitValue createPointValue 25

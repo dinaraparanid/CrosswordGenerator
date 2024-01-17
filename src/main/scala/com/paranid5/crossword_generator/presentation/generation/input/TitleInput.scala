@@ -1,27 +1,34 @@
 package com.paranid5.crossword_generator.presentation.generation.input
 
-import com.paranid5.crossword_generator.data.storage.{data, updateChannel}
+import com.paranid5.crossword_generator.data.storage.{dataStream, updateChannel}
 import com.paranid5.crossword_generator.data.storage.{StoragePreferences, storeTitleInput, titleInput}
 import com.paranid5.crossword_generator.presentation.ui.utils.PlaceholderTextComponent
 
 import zio.channel.Channel
-import zio.{RIO, Runtime, Scope, Unsafe, ZIO}
+import zio.{RIO, Runtime, Unsafe, ZIO}
 
 import javax.swing.JTextField
+
 import scala.xml.Elem
 
 private val TitlePlaceholder = "Crossword title"
 
-def TitleInput(): RIO[StoragePreferences & Scope, JTextField] =
-  val input = initialInputField
+/**
+ * Composes text field for the title input
+ * @return [[RIO]] with [[JTextField]] that completes
+ *         when all required content is set
+ */
+
+def TitleInput(): RIO[StoragePreferences, JTextField] =
+  val input = initialTitleInput
   val runtime = Runtime.default
 
-  def impl(
-    elem:        Elem,
-    updateChan:  Channel[Boolean],
-    initialText: String,
-  ): Unit =
+  @inline
+  def impl(initialText: String): Unit =
     input setText initialText
+
+  @inline
+  def recompose(updateChan: Channel[Boolean], elem: Elem): Unit =
     input addCaretListener: _ ⇒
       Unsafe unsafe:
         implicit unsafe ⇒
@@ -29,13 +36,24 @@ def TitleInput(): RIO[StoragePreferences & Scope, JTextField] =
             storeTitleInput(elem, updateChan, input.getText)
 
   for
-    elem  ← data
-    chan  ← updateChannel()
     title ← titleInput
-    _     ← ZIO attempt impl(elem, chan, title)
+    _     ← ZIO attempt impl(title)
+
+    elems ← dataStream
+    chan  ← updateChannel()
+    _     ← elems
+      .foreach:
+        ZIO attempt recompose(chan, _)
+      .fork
   yield input
 
-private def initialInputField: JTextField =
+/**
+ * Composes text field with placeholder [[TitlePlaceholder]]
+ * @return [[JTextField]] that is [[PlaceholderTextComponent]]
+ */
+
+@inline
+private def initialTitleInput: JTextField =
   new JTextField
     with PlaceholderTextComponent:
     setPlaceholder(TitlePlaceholder)

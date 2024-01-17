@@ -6,11 +6,31 @@ import zio.stream.UStream
 
 import scala.xml.{Elem, Node, XML}
 
+/**
+ * Retrieves a ZIO stream of title inputs from the XML data
+ * @return [[UStream]] of crossword titles
+ */
+
 def titleInputStream: URIO[StoragePreferences, UStream[String]] =
   stringDataStream("title")
 
+/**
+ * Retrieves a title input from the XML data
+ * @return current crossword title
+ */
+
 def titleInput: URIO[StoragePreferences, String] =
   stringData("title")
+
+/**
+ * Saves new [[titleInput]] to the disk,
+ * then sends broadcast to update the UI
+ *
+ * @param elem       current XML app config
+ * @param updateChan update messages channel
+ * @param titleInput title entered by user
+ * @return [[RIO]] that completes when UI broadcast is sent
+ */
 
 def storeTitleInput(
   elem:       Elem,
@@ -28,6 +48,14 @@ def storeTitleInput(
 
     _ ← notifyDataUpdate(updateChan)
   yield ()
+
+/**
+ * Updates the title value in the XML data
+ *
+ * @param data  application XML data
+ * @param input title entered by the user
+ * @return updated XML data element
+ */
 
 private def updatedTitle(data: Elem, input: String): Elem = data.copy(
   child = data.child.map:

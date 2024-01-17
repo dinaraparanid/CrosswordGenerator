@@ -18,12 +18,26 @@ private val WordsInitialText: String =
     |Minotaur - Cretan monster with the body of a man and the head of a bull, who lived in a Labyrinth and was killed by Theseus.
     |Scimitar - bladed stabbing and slashing edged weapon with a long single-edged blade having a double bend; something between a saber and a cleaver.""".stripMargin
 
+/**
+ * Retrieves a ZIO stream of crossword
+ * words and meanings input from the XML data
+ *
+ * @return [[UStream]] of crossword words with meanings
+ */
+
 def wordsInputStream: URIO[StoragePreferences, UStream[String]] =
   stringDataStream(
     that = "words",
     default = WordsInitialText,
     predicate = !_.isBlank
   )
+
+/**
+ * Retrieves a crossword words
+ * and meanings input from the XML data
+ *
+ * @return current crossword words with meanings
+ */
 
 def wordsInput: URIO[StoragePreferences, String] =
   stringData(
@@ -32,9 +46,26 @@ def wordsInput: URIO[StoragePreferences, String] =
     predicate = !_.isBlank
   )
 
+/**
+ * Produces a ZIO stream based on [[wordsInputStream]]
+ * that checks if words input is valid
+ *
+ * @return [[UStream]] of correctness states
+ */
+
 def isInputCorrectStream: URIO[StoragePreferences, UStream[Boolean]] =
   wordsInputStream map:
     _ map CrosswordCorrectInputRegex.matches
+
+/**
+ * Saves new [[wordsInput]] to the disk,
+ * then sends broadcast to update the UI
+ *
+ * @param elem       current XML app config
+ * @param updateChan update messages channel
+ * @param wordsInput words with meanings entered by user
+ * @return [[RIO]] that completes when UI broadcast is sent
+ */
 
 def storeWordsInput(
   elem:       Elem,
@@ -52,6 +83,14 @@ def storeWordsInput(
 
     _ ← notifyDataUpdate(updateChan)
   yield ()
+
+/**
+ * Updates the title value in the XML data
+ *
+ * @param data  application XML data
+ * @param input words entered by the user
+ * @return updated XML data element
+ */
 
 private def updatedWords(data: Elem, input: String): Elem = data.copy(
   child = data.child.map:
