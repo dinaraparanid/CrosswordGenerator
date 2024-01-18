@@ -2,6 +2,11 @@ ThisBuild / version := "0.1.0-SNAPSHOT"
 
 ThisBuild / scalaVersion := "3.3.1"
 
+assembly / assemblyMergeStrategy := {
+    case PathList("META-INF", _*) => MergeStrategy.discard
+    case _                        => MergeStrategy.first
+}
+
 lazy val root = (project in file("."))
   .settings(
     name := "CrosswordGenerator",

@@ -10,3 +10,5 @@ project
 target
 
 *.pdf
+preferences.xml
+CrosswordGenerator-0.1.0.jar

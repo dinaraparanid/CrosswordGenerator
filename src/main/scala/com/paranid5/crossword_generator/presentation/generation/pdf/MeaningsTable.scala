@@ -2,6 +2,7 @@ package com.paranid5.crossword_generator.presentation.generation.pdf
 
 import com.itextpdf.layout.element.{Cell, Paragraph, Table}
 import com.itextpdf.layout.properties.HorizontalAlignment
+
 import com.paranid5.crossword_generator.data.generation.population.{Layout, TableState, WordState}
 import com.paranid5.crossword_generator.domain.utils.tailOrNil
 

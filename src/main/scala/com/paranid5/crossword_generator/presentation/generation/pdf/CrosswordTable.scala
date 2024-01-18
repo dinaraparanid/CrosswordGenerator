@@ -43,12 +43,13 @@ private def CrosswordTable(
   val TableState(tab, wordStates) = tableState
   val table                       = tab map (_.clone)
   val wordsStarts                 = enumeratedWordStarts(wordStates)
+  val cellSize                    = requiredCellSize(tab.length)
 
   val cellList = for
     row  ← table.indices
     col  ← table.indices
     cell ← crosswordCell(row, col, table, wordsStarts)(letterCell)
-      .map(_ setMinWidth requiredCellSize setMinHeight requiredCellSize)
+      .map(_ setMinWidth cellSize setMinHeight cellSize)
   yield cell
 
   @tailrec
@@ -191,5 +192,5 @@ private def fatCell(
 /** Minimum cell size */
 
 @inline
-private def requiredCellSize: UnitValue =
-  UnitValue createPointValue 25
+private def requiredCellSize(tableSize: Int): UnitValue =
+  UnitValue createPointValue math.min(25F / tableSize * 18F, 25F)
